@@ -23,7 +23,7 @@ if __name__ == "__main__":
     print("Model was loaded successfully!")
 
     args = TrainingArguments(
-        output_dir=f"./models/{lan}",
+        output_dir=f"/home/clusterusers/momock/NLBSE2025/results/baseline/reimplementation/models/{lan}",
         batch_size=32,
         num_epochs=5,
         save_steps=1,
@@ -41,4 +41,4 @@ if __name__ == "__main__":
 
     trainer.train()
 
-    trainer.model.save_pretrained(f'./models/{lan}')
+    trainer.model.save_pretrained(f'/home/clusterusers/momock/NLBSE2025/results/baseline/reimplementation/models/{lan}')

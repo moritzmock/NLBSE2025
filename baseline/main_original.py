@@ -31,14 +31,14 @@ if __name__ == "__main__":
             batch_size=32,
         )
         trainer.train()
-        trainer.model.save_pretrained(f'./models/{lan}')
+        trainer.model.save_pretrained(f'/home/clusterusers/momock/NLBSE2025/results/baseline/original/models/{lan}')
 
     total_flops = 0
     total_time = 0
     scores = []
     for lan in langs:
         # to load trained models:
-        model = SetFitModel.from_pretrained(f'./models/{lan}')
+        model = SetFitModel.from_pretrained(f'/home/clusterusers/momock/NLBSE2025/results/baseline/original/models/{lan}')
         # to load pretrained models from Hub:
         # model = SetFitModel.from_pretrained(f"NLBSE/nlbse25_{lan}")
         with torch.profiler.profile(with_flops=True) as p:
