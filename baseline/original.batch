@@ -8,7 +8,7 @@
 #SBATCH --nodes=1 # use a single cluster node
 #SBATCH --mem=80G
 #SBATCH --time=5-0:00:00
-#SBATCH --gres=gpu:v100
+#SBATCH --gres=gpu:a100_3g.40gb
 #SBATCH --account=ml-vuln
 #SBATCH --partition=gpu-low
 
