@@ -19,6 +19,7 @@ if __name__ == "__main__":
     model = SetFitModel.from_pretrained(
         "paraphrase-MiniLM-L3-v2",
         multi_target_strategy="multi-output",
+        device='cuda'
     )
     print("Model was loaded successfully!")
 
