@@ -130,6 +130,8 @@ if __name__ == "__main__":
     print("Dataset was loaded successfully!")
 
     for lan in langs:
+        print(f"Training the model for the language {lan}...")
+
         create_path_structure(f"{args.output_path}/{lan}/results", args.clear_output_path)
         create_path_structure(f"{args.output_path}/{lan}/log", args.clear_output_path)
         create_path_structure(f"{args.output_path}/{lan}/models", args.clear_output_path)
