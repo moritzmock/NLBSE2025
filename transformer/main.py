@@ -6,7 +6,6 @@ from datasets import load_dataset, Dataset
 
 import numpy as np
 import torch
-from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 
 def compute_metrics(eval_pred):
     # Unpack the predictions and labels
@@ -30,37 +29,34 @@ def compute_metrics(eval_pred):
     labels = labels.cpu().numpy()
 
     # Check if predictions and labels are compatible
-    print("Predictions shape:", predictions.shape)
-    print("Labels shape:", labels.shape)
+    num_classes = labels.shape[1]
+    class_metrics = {}
 
-    # Compute metrics
-    accuracy = accuracy_score(labels, predictions)
+    # Calculate TP, FP, TN, FN per class
+    for class_idx in range(num_classes):
+        tp = np.sum((predictions[:, class_idx] == 1) & (labels[:, class_idx] == 1))
+        fp = np.sum((predictions[:, class_idx] == 1) & (labels[:, class_idx] == 0))
+        tn = np.sum((predictions[:, class_idx] == 0) & (labels[:, class_idx] == 0))
+        fn = np.sum((predictions[:, class_idx] == 0) & (labels[:, class_idx] == 1))
 
-    # Calculate precision, recall, and F1 score
-    precision, recall, f1, _ = precision_recall_fscore_support(labels, predictions, average="weighted")
+        # Calculate precision, recall, and F1 score for the current class
+        precision = tp / (tp + fp) if (tp + fp) > 0 else 0
+        recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+        f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
 
-    # Calculate TP, FP, TN, FN
-    TP = np.sum((predictions == 1) & (labels == 1), axis=0)
-    FP = np.sum((predictions == 1) & (labels == 0), axis=0)
-    TN = np.sum((predictions == 0) & (labels == 0), axis=0)
-    FN = np.sum((predictions == 0) & (labels == 1), axis=0)
+        # Store metrics for the current class
+        class_metrics[class_idx] = {
+            "true_positives": tp,
+            "false_positives": fp,
+            "true_negatives": tn,
+            "false_negatives": fn,
+            "precision": precision,
+            "recall": recall,
+            "f1": f1,
+        }
 
-    # Aggregate results across all classes
-    tp_total = TP.sum()
-    fp_total = FP.sum()
-    tn_total = TN.sum()
-    fn_total = FN.sum()
+    return class_metrics
 
-    return {
-        "accuracy": accuracy,
-        "precision": precision,
-        "recall": recall,
-        "f1": f1,
-        "tp": tp_total,
-        "fp": fp_total,
-        "tn": tn_total,
-        "fn": fn_total,
-    }
 
 
 
