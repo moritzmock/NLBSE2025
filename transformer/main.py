@@ -128,7 +128,8 @@ if __name__ == "__main__":
     args = read_args()
     print(args)
 
-    langs = ['java', 'python', 'pharo']
+    #langs = ['java', 'python', 'pharo']
+    langs = ['python'] # todo remove
     labels = {
         'java': ['summary', 'Ownership', 'Expand', 'usage', 'Pointer', 'deprecation', 'rational'],
         'python': ['Usage', 'Parameters', 'DevelopmentNotes', 'Expand', 'Summary'],
@@ -191,4 +192,6 @@ if __name__ == "__main__":
 
         trainer.save_model(f"{args.output_path}/{lan}/models")
 
-        trainer.evaluate(eval_dataset=test_data)
+        result = trainer.evaluate(eval_dataset=test_data)
+
+        print(result)
