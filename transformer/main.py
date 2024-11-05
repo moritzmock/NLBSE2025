@@ -154,8 +154,7 @@ if __name__ == "__main__":
     args = read_args()
     print(args)
 
-    # langs = ['java', 'python', 'pharo']
-    langs = ['python']  # todo remove
+    langs = ['java', 'python', 'pharo']
     labels = {
         'java': ['summary', 'Ownership', 'Expand', 'usage', 'Pointer', 'deprecation', 'rational'],
         'python': ['Usage', 'Parameters', 'DevelopmentNotes', 'Expand', 'Summary'],
