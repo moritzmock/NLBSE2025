@@ -1,11 +1,14 @@
 import argparse
 import os.path
 import shutil
-from transformers import RobertaTokenizer, RobertaForSequenceClassification, Trainer, TrainingArguments, DataCollatorWithPadding
+from transformers import RobertaTokenizer, RobertaForSequenceClassification, Trainer, TrainingArguments, \
+    DataCollatorWithPadding
 from datasets import load_dataset, Dataset
+import re
 
 import numpy as np
 import torch
+
 
 def compute_metrics(eval_pred):
     # Unpack the predictions and labels
@@ -54,9 +57,6 @@ def compute_metrics(eval_pred):
         class_metrics[f"class_{class_idx}_f1"] = f1
 
     return class_metrics
-
-
-
 
 
 def tokenize(batch):
@@ -136,12 +136,26 @@ def create_path_structure(path, clear):
         print(f"All objects in {path} have been removed.")
 
 
+def rename_keys_with_regex(d, old_prefix, new_prefix):
+    pattern = re.compile(r'^' + re.escape(old_prefix))
+
+    new_dict = {}
+    for key in d:
+        if pattern.match(key):
+            new_key = pattern.sub(new_prefix, key)
+            new_dict[new_key] = d[key]
+        else:
+            new_dict[key] = d[key]
+
+    return new_dict
+
+
 if __name__ == "__main__":
     args = read_args()
     print(args)
 
-    #langs = ['java', 'python', 'pharo']
-    langs = ['python'] # todo remove
+    # langs = ['java', 'python', 'pharo']
+    langs = ['python']  # todo remove
     labels = {
         'java': ['summary', 'Ownership', 'Expand', 'usage', 'Pointer', 'deprecation', 'rational'],
         'python': ['Usage', 'Parameters', 'DevelopmentNotes', 'Expand', 'Summary'],
@@ -206,4 +220,10 @@ if __name__ == "__main__":
 
         result = trainer.evaluate(eval_dataset=test_data)
 
-        print(result)
+        for i, key in enumerate(labels[lan]):
+            result = rename_keys_with_regex(result, f"eval_class_{i}", f"eval_class_{key}")
+
+        for key in result.keys():
+            print(f"{key}: {result[key]}")
+
+        print("---------------------")
