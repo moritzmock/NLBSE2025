@@ -12,7 +12,7 @@
 #SBATCH --account=ml-vuln
 #SBATCH --partition=gpu-low
 
-cd /home/clusterusers/momock/NLBSE2025/baseline
+cd /home/clusterusers/momock/NLBSE2025/transformer
 module purge
 echo "Should be empty"
 module list
