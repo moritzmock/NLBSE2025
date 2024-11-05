@@ -35,6 +35,7 @@ def modify_data(data):
     data = data.map(tokenize, batched=True)
     data.set_format(type="torch", columns=["input_ids", "attention_mask", "labels"])
     data = data.remove_columns(['text'])
+    data = data.map(lambda x: {"labels": x["labels"].float()})
 
     return data
 
@@ -58,6 +59,17 @@ def read_args():
     parser.add_argument("--clear-output-path", default=True, type=str2bool)
 
     return parser.parse_args()
+
+
+class CustomTrainer(Trainer):
+    def compute_loss(self, model, inputs, return_outputs=False):
+        labels = inputs.get("labels")
+        # Convert labels to float if needed
+        if labels is not None:
+            inputs["labels"] = labels.float()
+        outputs = model(**inputs)
+        loss = outputs.get("loss") if isinstance(outputs, dict) else outputs[0]
+        return (loss, outputs) if return_outputs else loss
 
 
 def create_path_structure(path, clear):
@@ -142,7 +154,7 @@ if __name__ == "__main__":
 
         data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
-        trainer = Trainer(
+        trainer = CustomTrainer(
             model=model,
             args=training_args,
             train_dataset=train_data,
