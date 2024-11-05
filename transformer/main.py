@@ -45,15 +45,13 @@ def compute_metrics(eval_pred):
         f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
 
         # Store metrics for the current class
-        class_metrics[class_idx] = {
-            "true_positives": tp,
-            "false_positives": fp,
-            "true_negatives": tn,
-            "false_negatives": fn,
-            "precision": precision,
-            "recall": recall,
-            "f1": f1,
-        }
+        class_metrics[f"class_{class_idx}_true_positives"] = tp
+        class_metrics[f"class_{class_idx}_false_positives"] = fp
+        class_metrics[f"class_{class_idx}_true_negatives"] = tn
+        class_metrics[f"class_{class_idx}_false_negatives"] = fn
+        class_metrics[f"class_{class_idx}_precision"] = precision
+        class_metrics[f"class_{class_idx}_recall"] = recall
+        class_metrics[f"class_{class_idx}_f1"] = f1
 
     return class_metrics
 
