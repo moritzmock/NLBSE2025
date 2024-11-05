@@ -5,8 +5,7 @@ import torch
 from transformers import RobertaTokenizer, RobertaForSequenceClassification, Trainer, TrainingArguments, DataCollatorWithPadding
 from datasets import load_dataset, Dataset
 import numpy as np
-
-from sklearn.metrics import accuracy_score, precision_recall_fscore_support, confusion_matrix
+from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 
 def compute_metrics(eval_pred):
     # Unpack the predictions and labels
@@ -18,15 +17,25 @@ def compute_metrics(eval_pred):
     if isinstance(labels, np.ndarray):
         labels = torch.from_numpy(labels)
 
-    # Get the predicted class by applying argmax
-    predictions = torch.argmax(logits, dim=-1)
+    # Apply sigmoid to logits to get probabilities (for multilabel)
+    probabilities = torch.sigmoid(logits)  # Shape: (num_samples, num_classes)
+
+    # Convert probabilities to binary predictions based on a threshold
+    threshold = 0.5
+    predictions = (probabilities >= threshold).int()  # Binarize predictions
 
     # Ensure predictions and labels are on the same device (CPU)
     predictions = predictions.cpu().numpy()
     labels = labels.cpu().numpy()
 
+    # Check if predictions and labels are compatible
+    print("Predictions shape:", predictions.shape)
+    print("Labels shape:", labels.shape)
+
     # Compute metrics
     accuracy = accuracy_score(labels, predictions)
+
+    # Calculate precision, recall, and F1 score
     precision, recall, f1, _ = precision_recall_fscore_support(labels, predictions, average="weighted")
 
     return {
@@ -35,6 +44,7 @@ def compute_metrics(eval_pred):
         "recall": recall,
         "f1": f1,
     }
+
 
 
 def tokenize(batch):
