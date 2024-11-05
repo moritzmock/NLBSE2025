@@ -1,10 +1,11 @@
 import argparse
 import os.path
 import shutil
-import torch
 from transformers import RobertaTokenizer, RobertaForSequenceClassification, Trainer, TrainingArguments, DataCollatorWithPadding
 from datasets import load_dataset, Dataset
+
 import numpy as np
+import torch
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 
 def compute_metrics(eval_pred):
@@ -38,12 +39,29 @@ def compute_metrics(eval_pred):
     # Calculate precision, recall, and F1 score
     precision, recall, f1, _ = precision_recall_fscore_support(labels, predictions, average="weighted")
 
+    # Calculate TP, FP, TN, FN
+    TP = np.sum((predictions == 1) & (labels == 1), axis=0)
+    FP = np.sum((predictions == 1) & (labels == 0), axis=0)
+    TN = np.sum((predictions == 0) & (labels == 0), axis=0)
+    FN = np.sum((predictions == 0) & (labels == 1), axis=0)
+
+    # Aggregate results across all classes
+    tp_total = TP.sum()
+    fp_total = FP.sum()
+    tn_total = TN.sum()
+    fn_total = FN.sum()
+
     return {
         "accuracy": accuracy,
         "precision": precision,
         "recall": recall,
         "f1": f1,
+        "tp": tp_total,
+        "fp": fp_total,
+        "tn": tn_total,
+        "fn": fn_total,
     }
+
 
 
 
