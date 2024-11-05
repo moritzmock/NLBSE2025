@@ -4,25 +4,35 @@ import shutil
 import torch
 from transformers import RobertaTokenizer, RobertaForSequenceClassification, Trainer, TrainingArguments, DataCollatorWithPadding
 from datasets import load_dataset, Dataset
-from evaluate import load
-from sklearn.metrics import confusion_matrix
 
-
-accuracy = load("accuracy")
-precision = load("precision")
-recall = load("recall")
-f1 = load("f1")
-
+from sklearn.metrics import accuracy_score, precision_recall_fscore_support, confusion_matrix
 
 def compute_metrics(eval_pred):
+    # Unpack the predictions and labels
     logits, labels = eval_pred
+
+    # Convert logits to a PyTorch tensor if they are in NumPy format
+    if isinstance(logits, np.ndarray):
+        logits = torch.from_numpy(logits)
+    if isinstance(labels, np.ndarray):
+        labels = torch.from_numpy(labels)
+
+    # Get the predicted class by applying argmax
     predictions = torch.argmax(logits, dim=-1)
 
+    # Ensure predictions and labels are on the same device (CPU)
+    predictions = predictions.cpu().numpy()
+    labels = labels.cpu().numpy()
+
+    # Compute metrics
+    accuracy = accuracy_score(labels, predictions)
+    precision, recall, f1, _ = precision_recall_fscore_support(labels, predictions, average="weighted")
+
     return {
-        "accuracy": accuracy.compute(predictions=predictions, references=labels)["accuracy"],
-        "precision": precision.compute(predictions=predictions, references=labels, average="weighted")["precision"],
-        "recall": recall.compute(predictions=predictions, references=labels, average="weighted")["recall"],
-        "f1": f1.compute(predictions=predictions, references=labels, average="weighted")["f1"],
+        "accuracy": accuracy,
+        "precision": precision,
+        "recall": recall,
+        "f1": f1,
     }
 
 
