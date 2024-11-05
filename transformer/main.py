@@ -220,7 +220,7 @@ if __name__ == "__main__":
         result = trainer.evaluate(eval_dataset=test_data)
 
         for i, key in enumerate(labels[lan]):
-            result = rename_keys_with_regex(result, f"eval_class_{i}", f"eval_class_{key}")
+            result = rename_keys_with_regex(result, f"eval_class_{i}", f"eval_{lan}_class_{key}")
 
         for key in result.keys():
             print(f"{key}: {result[key]}")
