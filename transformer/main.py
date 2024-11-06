@@ -269,7 +269,7 @@ if __name__ == "__main__":
     print("Tokenizer was loaded successfully!")
 
     if args.hs == False:
-        train_models(args)
+        train_models(args, ds)
 
     if args.hs == True:
         epochs = [1, 3, 5, 10]
