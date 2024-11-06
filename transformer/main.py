@@ -262,7 +262,7 @@ def convert_duration(seconds):
     minutes, seconds = divmod(remainder, 60)  # 60 seconds in a minute
 
     # Format the result as dd-hh-mm-ss
-    return f"{days:02d}-{hours:02d}-{minutes:02d}-{seconds:02d}"
+    return f"{days}-{hours}-{minutes}-{seconds}"
 
 
 if __name__ == "__main__":
