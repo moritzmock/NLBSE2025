@@ -1,7 +1,7 @@
 import argparse
 import os.path
 import shutil
-
+import time
 import pandas as pd
 from transformers import RobertaTokenizer, RobertaForSequenceClassification, Trainer, TrainingArguments, \
     DataCollatorWithPadding
@@ -249,6 +249,17 @@ def train_models(args, ds):
         print("---------------------")
 
 
+
+def convert_duration(seconds):
+    # Calculate days, hours, minutes, and seconds
+    days, remainder = divmod(seconds, 86400)  # 86400 seconds in a day
+    hours, remainder = divmod(remainder, 3600)  # 3600 seconds in an hour
+    minutes, seconds = divmod(remainder, 60)  # 60 seconds in a minute
+
+    # Format the result as dd-hh-mm-ss
+    return f"{days:02d}-{hours:02d}-{minutes:02d}-{seconds:02d}"
+
+
 if __name__ == "__main__":
     args = read_args()
     print(args)
@@ -267,6 +278,8 @@ if __name__ == "__main__":
     tokenizer = RobertaTokenizer.from_pretrained(args.model)
 
     print("Tokenizer was loaded successfully!")
+
+    start_time = time.time()
 
     if args.hs == False:
         train_models(args, ds)
@@ -290,3 +303,8 @@ if __name__ == "__main__":
             print(f"Execution number {index} out of {len(combinations)}")
 
             train_models(args, ds)
+
+    end_time = time.time()
+
+    duration = end_time - start_time
+    print(f"Execution time: {convert_duration(duration)}")
