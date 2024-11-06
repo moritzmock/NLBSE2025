@@ -229,6 +229,8 @@ def train_models(args, ds):
 
         result = trainer.evaluate(eval_dataset=test_data)
 
+        print(result)
+
         for i, key in enumerate(labels[lan]):
             result = rename_keys_with_regex(result, f"eval_class_{i}", f"eval_{lan}_class_{key}")
             result = rename_keys_with_regex(result, f"eval_class", f"eval_{lan}_class")
