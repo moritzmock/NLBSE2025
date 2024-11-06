@@ -231,6 +231,7 @@ def train_models(args, ds):
 
         for i, key in enumerate(labels[lan]):
             result = rename_keys_with_regex(result, f"eval_class_{i}", f"eval_{lan}_class_{key}")
+            result = rename_keys_with_regex(result, f"eval_class", f"eval_{lan}_class")
 
         job_id = os.getenv("SLURM_JOB_ID")
         path = os.path.join(args.output_path, f"all_results_{job_id}.csv")
@@ -300,7 +301,7 @@ if __name__ == "__main__":
             args.batch_size = combination[3]     # overwrites the parameter
             args.weight_decay = combination[4]   # overwrites the parameter
 
-            print(f"Execution number {index} out of {len(combinations)}")
+            print(f"Execution number {index+1} out of {len(combinations)}")
 
             train_models(args, ds)
 
