@@ -44,4 +44,4 @@ EOF
 
 nvidia-smi
 
-python main.py --output-path /data/users/momock/NLBSE25/results --hs False --eval-strategy epoch
+python main.py --output-path /data/users/momock/NLBSE25/results --model roberta-base
