@@ -7,9 +7,13 @@ from transformers import RobertaTokenizer, RobertaForSequenceClassification, Tra
     DataCollatorWithPadding
 from datasets import load_dataset, Dataset
 import re
-
+from itertools import product
 import numpy as np
 import torch
+
+
+def generate_combinations(*arrays):
+    return list(product(*arrays))
 
 
 def compute_metrics(eval_pred):
@@ -158,6 +162,7 @@ def read_args():
 
     parser.add_argument("--output-path", required=True)
     parser.add_argument("--clear-output-path", default=True, type=str2bool)
+    parser.add_argument("--hs", default=True, type=str2bool)
     parser.add_argument("--model", default="roberta-base")
     parser.add_argument("--batch_size", default=8)
     parser.add_argument("--epochs", default=3)
@@ -167,20 +172,9 @@ def read_args():
 
     return parser.parse_args()
 
-if __name__ == "__main__":
-    args = read_args()
+
+def train_models(args, ds):
     print(args)
-
-    langs = ['java', 'python', 'pharo']
-    labels = {
-        'java': ['summary', 'Ownership', 'Expand', 'usage', 'Pointer', 'deprecation', 'rational'],
-        'python': ['Usage', 'Parameters', 'DevelopmentNotes', 'Expand', 'Summary'],
-        'pharo': ['Keyimplementationpoints', 'Example', 'Responsibilities', 'Classreferences', 'Intent', 'Keymessages',
-                  'Collaborators']
-    }
-
-    ds = load_dataset('NLBSE/nlbse25-code-comment-classification')
-    print("Dataset was loaded successfully!")
 
     for lan in langs:
         print(f"Training the model for the language {lan}...")
@@ -257,3 +251,42 @@ if __name__ == "__main__":
         csv_data.to_csv(path, index=False)
 
         print("---------------------")
+
+
+if __name__ == "__main__":
+    args = read_args()
+    print(args)
+
+    langs = ['java', 'python', 'pharo']
+    labels = {
+        'java': ['summary', 'Ownership', 'Expand', 'usage', 'Pointer', 'deprecation', 'rational'],
+        'python': ['Usage', 'Parameters', 'DevelopmentNotes', 'Expand', 'Summary'],
+        'pharo': ['Keyimplementationpoints', 'Example', 'Responsibilities', 'Classreferences', 'Intent', 'Keymessages',
+                  'Collaborators']
+    }
+
+    ds = load_dataset('NLBSE/nlbse25-code-comment-classification')
+    print("Dataset was loaded successfully!")
+
+    if args.hs == False:
+        train_models(args)
+
+    if args.hs == True:
+        epochs = [1, 3, 5, 10]
+        lr = [1e-5, 2e-5, 3e-5, 4e-5, 5e-5]
+        eval_strategy = ["no", "epoch"]
+        batch_size = [1, 2, 4, 8, 16, 32]
+        weight_decay = [0, 0.01, 0.001]
+        arrays = [epochs, lr, eval_strategy, batch_size, weight_decay]
+        combinations = generate_combinations(*arrays)
+
+        for index, combination in enumerate(combinations):
+            args.epochs = combination[0]         # overwrites the parameter
+            args.lr = combination[1]             # overwrites the parameter
+            args.eval_strategy = combination[2]  # overwrites the parameter
+            args.batch_size = combination[3]     # overwrites the parameter
+            args.weight_decay = combination[4]   # overwrites the parameter
+
+            print(f"Execution number {index} out of {len(combinations)}")
+
+            train_models(args, ds)
