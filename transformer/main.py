@@ -146,8 +146,7 @@ def rename_keys_with_regex(d, old_prefix, new_prefix):
     return new_dict
 
 
-def generate_information(args):
-    job_id = os.getenv("SLURM_JOB_ID")
+def generate_information(args, jobID):
     return f"{job_id}_" \
            f"{args.model}_" \
            f"{args.batch_size}_" \
@@ -233,12 +232,13 @@ def train_models(args, ds):
         for i, key in enumerate(labels[lan]):
             result = rename_keys_with_regex(result, f"eval_class_{i}", f"eval_{lan}_class_{key}")
 
-        path = os.path.join(args.output_path, "all_results.csv")
+        job_id = os.getenv("SLURM_JOB_ID")
+        path = os.path.join(args.output_path, f"all_results_{job_id}.csv")
         csv_data = pd.read_csv(path) if os.path.exists(path) else pd.DataFrame()
 
         index = len(csv_data) if langs.index(lan) == 0 else len(csv_data) - 1
 
-        csv_data.loc[index, "info"] = generate_information(args)
+        csv_data.loc[index, "info"] = generate_information(args, job_id)
 
         for key in result.keys():
             print(f"{key}: {result[key]}")
