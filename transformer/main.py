@@ -245,6 +245,8 @@ def train_models(args, ds):
             print(f"{key}: {result[key]}")
             csv_data.loc[index, key] = result[key]
 
+        print(csv_data.keys())
+
         csv_data.to_csv(path, index=False)
 
         print("---------------------")
