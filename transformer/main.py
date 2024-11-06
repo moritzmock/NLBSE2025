@@ -175,6 +175,8 @@ def read_args():
 def train_models(args, ds):
     print(args)
 
+    job_id = os.getenv("SLURM_JOB_ID")
+
     for lan in langs:
         print(f"Training the model for the language {lan}...")
 
@@ -234,7 +236,6 @@ def train_models(args, ds):
         for i, key in enumerate(labels[lan]):
             result = rename_keys_with_regex(result, "eval_" + lan + "_class_" + str(i), "eval_" + lan + "_class_" + key)
 
-        job_id = os.getenv("SLURM_JOB_ID")
         path = os.path.join(args.output_path, f"all_results_{job_id}.csv")
         csv_data = pd.read_csv(path) if os.path.exists(path) else pd.DataFrame()
 
