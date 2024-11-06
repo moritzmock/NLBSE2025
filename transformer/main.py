@@ -266,7 +266,7 @@ if __name__ == "__main__":
     args = read_args()
     print(args)
 
-    langs = ['python'] #['java', 'python', 'pharo']
+    langs = ['java', 'python', 'pharo']
     labels = {
         'java': ['summary', 'Ownership', 'Expand', 'usage', 'Pointer', 'deprecation', 'rational'],
         'python': ['Usage', 'Parameters', 'DevelopmentNotes', 'Expand', 'Summary'],
