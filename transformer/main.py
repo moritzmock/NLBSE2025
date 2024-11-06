@@ -191,10 +191,6 @@ def train_models(args, ds):
 
         print("Model was loaded successfully!")
 
-        tokenizer = RobertaTokenizer.from_pretrained(args.model)
-
-        print("Tokenizer was loaded successfully!")
-
         train_data_complete = modify_data(train)
         test_data = modify_data(test)
         train_data = train_data_complete.train_test_split(test_size=len(test_data)/len(train_data_complete), seed=42)["train"] if args.eval_strategy != "no" else train_data_complete
@@ -267,6 +263,10 @@ if __name__ == "__main__":
 
     ds = load_dataset('NLBSE/nlbse25-code-comment-classification')
     print("Dataset was loaded successfully!")
+
+    tokenizer = RobertaTokenizer.from_pretrained(args.model)
+
+    print("Tokenizer was loaded successfully!")
 
     if args.hs == False:
         train_models(args)
