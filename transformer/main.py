@@ -147,7 +147,7 @@ def rename_keys_with_regex(d, old_prefix, new_prefix):
 
 
 def generate_information(args, jobID):
-    return f"{job_id}_" \
+    return f"{jobID}_" \
            f"{args.model}_" \
            f"{args.batch_size}_" \
            f"{args.epochs}_" \
