@@ -229,8 +229,6 @@ def train_models(args, ds):
 
         result = trainer.evaluate(eval_dataset=test_data)
 
-        print(result)
-
         result = rename_keys_with_regex(result, "eval_", "eval_" + lan + "_")
         result = rename_keys_with_regex(result, "epoch", "epoch_" + lan)
         for i, key in enumerate(labels[lan]):
@@ -247,8 +245,6 @@ def train_models(args, ds):
         for key in result.keys():
             print(f"{key}: {result[key]}")
             csv_data.loc[index, key] = result[key]
-
-        print(csv_data.keys())
 
         csv_data.to_csv(path, index=False)
 
