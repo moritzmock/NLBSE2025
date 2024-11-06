@@ -1,6 +1,8 @@
 import argparse
 import os.path
 import shutil
+
+import pandas as pd
 from transformers import RobertaTokenizer, RobertaForSequenceClassification, Trainer, TrainingArguments, \
     DataCollatorWithPadding
 from datasets import load_dataset, Dataset
@@ -84,16 +86,6 @@ def str2bool(value):
         raise argparse.ArgumentTypeError("Boolean value expected.")
 
 
-def read_args():
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument("--output-path", required=True)
-    parser.add_argument("--model", default="roberta-base")
-    parser.add_argument("--clear-output-path", default=True, type=str2bool)
-
-    return parser.parse_args()
-
-
 class CustomTrainer(Trainer):
     def compute_loss(self, model, inputs, return_outputs=False):
         labels = inputs.get("labels")
@@ -150,6 +142,32 @@ def rename_keys_with_regex(d, old_prefix, new_prefix):
     return new_dict
 
 
+def generate_information(args):
+    job_id = os.getenv("SLURM_JOB_ID")
+    return f"{job_id}_" \
+           f"{args.model}_" \
+           f"{args.batch_size}_" \
+           f"{args.epochs}_" \
+           f"{args.weight_decay}_" \
+           f"{args.lr}_" \
+           f"{args.eval_strategy}"
+
+
+def read_args():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--output-path", required=True)
+    parser.add_argument("--clear-output-path", default=True, type=str2bool)
+    parser.add_argument("--model", default="roberta-base")
+    parser.add_argument("--batch_size", default=8)
+    parser.add_argument("--epochs", default=3)
+    parser.add_argument("--weight-decay", default=0.01)
+    parser.add_argument("--lr", default=5e-5)
+    parser.add_argument("--eval-strategy", default="no", choices=["no", "epoch"])
+    parser.add_argument("--jobID", required=True)
+
+    return parser.parse_args()
+
 if __name__ == "__main__":
     args = read_args()
     print(args)
@@ -184,18 +202,21 @@ if __name__ == "__main__":
 
         print("Tokenizer was loaded successfully!")
 
-        train_data = modify_data(train)
+        train_data_complete = modify_data(train)
         test_data = modify_data(test)
+        train_data = train_data_complete.train_test_split(test_size=len(test_data)/len(train_data_complete), seed=42)["train"] if args.eval_strategy != "no" else train_data_complete
+        val_data = train_data_complete.train_test_split(test_size=len(test_data)/len(train_data_complete), seed=42)["test"] if args.eval_strategy != "no" else None
 
         print("Dataset was mutated successfully!")
 
         training_args = TrainingArguments(
             output_dir=f"{args.output_path}/{lan}/results",
-            eval_strategy="no",
-            per_device_train_batch_size=8,
-            per_device_eval_batch_size=8,
-            num_train_epochs=3,
-            weight_decay=0.01,
+            eval_strategy=args.eval_strategy,
+            per_device_train_batch_size=args.batch_size,
+            per_device_eval_batch_size=args.batch_size,
+            num_train_epochs=args.epochs,
+            weight_decay=args.weight_decay,
+            learning_rate=args.lr,
             logging_dir=f"{args.output_path}/{lan}/logs"
         )
 
@@ -207,6 +228,7 @@ if __name__ == "__main__":
             model=model,
             args=training_args,
             train_dataset=train_data,
+            eval_dataset=val_data,
             compute_metrics=compute_metrics,
             data_collator=data_collator
         )
@@ -222,7 +244,17 @@ if __name__ == "__main__":
         for i, key in enumerate(labels[lan]):
             result = rename_keys_with_regex(result, f"eval_class_{i}", f"eval_{lan}_class_{key}")
 
+        path = os.path.join(args.output_path, "all_results.csv")
+        csv_data = pd.read_csv(path) if os.path.exists(path) else pd.DataFrame()
+
+        index = len(csv_data)
+
+        csv_data.loc[index, "info"] = generate_information(args)
+
         for key in result.keys():
             print(f"{key}: {result[key]}")
+            csv_data.loc[index, key] = result[key]
+
+        csv_data.to_csv(path, index=False)
 
         print("---------------------")
