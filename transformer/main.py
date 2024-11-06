@@ -231,9 +231,10 @@ def train_models(args, ds):
 
         print(result)
 
+        result = rename_keys_with_regex(result, "eval_", "eval_" + lan + "_")
+        result = rename_keys_with_regex(result, "epoch", "epoch_" + lan)
         for i, key in enumerate(labels[lan]):
-            result = rename_keys_with_regex(result, f"eval_class_{i}", f"eval_{lan}_class_{key}")
-            result = rename_keys_with_regex(result, f"eval_class", f"eval_{lan}_class")
+            result = rename_keys_with_regex(result, "eval_" + lan + "_class_" + str(i), "eval_" + lan + "_class_" + key)
 
         job_id = os.getenv("SLURM_JOB_ID")
         path = os.path.join(args.output_path, f"all_results_{job_id}.csv")
