@@ -178,9 +178,9 @@ def train_models(args, ds):
     for lan in langs:
         print(f"Training the model for the language {lan}...")
 
-        create_path_structure(f"{args.output_path}/{lan}/results", args.clear_output_path)
-        create_path_structure(f"{args.output_path}/{lan}/log", args.clear_output_path)
-        create_path_structure(f"{args.output_path}/{lan}/models", args.clear_output_path)
+        create_path_structure(f"{args.output_path}/{job_id}/{lan}/results", args.clear_output_path)
+        create_path_structure(f"{args.output_path}/{job_id}/{lan}/log", args.clear_output_path)
+        create_path_structure(f"{args.output_path}/{job_id}/{lan}/models", args.clear_output_path)
 
         train = ds[f"{lan}_train"]
         test = ds[f"{lan}_test"]
@@ -198,14 +198,14 @@ def train_models(args, ds):
         print("Dataset was mutated successfully!")
 
         training_args = TrainingArguments(
-            output_dir=f"{args.output_path}/{lan}/results",
+            output_dir=f"{args.output_path}/{job_id}/{lan}/results",
             eval_strategy=args.eval_strategy,
             per_device_train_batch_size=args.batch_size,
             per_device_eval_batch_size=args.batch_size,
             num_train_epochs=args.epochs,
             weight_decay=args.weight_decay,
             learning_rate=args.lr,
-            logging_dir=f"{args.output_path}/{lan}/logs"
+            logging_dir=f"{args.output_path}/{job_id}/{lan}/logs"
         )
 
         print("TrainingArguments were created successfully!")
@@ -225,7 +225,7 @@ def train_models(args, ds):
 
         trainer.train()
 
-        trainer.save_model(f"{args.output_path}/{lan}/models")
+        trainer.save_model(f"{args.output_path}/{job_id}/{lan}/models")
 
         result = trainer.evaluate(eval_dataset=test_data)
 
