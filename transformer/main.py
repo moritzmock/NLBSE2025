@@ -162,7 +162,7 @@ def read_args():
 
     parser.add_argument("--output-path", required=True)
     parser.add_argument("--clear-output-path", default=True, type=str2bool)
-    parser.add_argument("--hs", default=True, type=str2bool)
+    parser.add_argument("--hs", default=True, type=str2bool, help="If true, the hyperparameters are overwritten")
     parser.add_argument("--model", default="roberta-base")
     parser.add_argument("--batch_size", default=8)
     parser.add_argument("--epochs", default=3)
@@ -236,7 +236,7 @@ def train_models(args, ds):
         path = os.path.join(args.output_path, "all_results.csv")
         csv_data = pd.read_csv(path) if os.path.exists(path) else pd.DataFrame()
 
-        index = len(csv_data) - 1 * langs.index(lan)
+        index = len(csv_data) if langs.index(lan) == 0 else len(csv_data) - 1
 
         csv_data.loc[index, "info"] = generate_information(args)
 
