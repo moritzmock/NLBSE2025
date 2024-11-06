@@ -246,7 +246,7 @@ if __name__ == "__main__":
         path = os.path.join(args.output_path, "all_results.csv")
         csv_data = pd.read_csv(path) if os.path.exists(path) else pd.DataFrame()
 
-        index = len(csv_data)
+        index = len(csv_data) - 1 * langs.index(lan)
 
         csv_data.loc[index, "info"] = generate_information(args)
 
