@@ -162,6 +162,8 @@ def read_args():
     parser.add_argument("--output-path", required=True)
     parser.add_argument("--clear-output-path", default=True, type=str2bool)
     parser.add_argument("--hs", default=True, type=str2bool, help="If true, the hyperparameters are overwritten")
+    parser.add_argument("--old-run", default="False", type=str,
+                        help="Passing the csv file of an old run allows to skip executed experiments")
     parser.add_argument("--model", default="roberta-base")
     parser.add_argument("--batch_size", default=8)
     parser.add_argument("--epochs", default=3)
@@ -172,10 +174,8 @@ def read_args():
     return parser.parse_args()
 
 
-def train_models(args, ds):
+def train_models(args, ds, job_id):
     print(args)
-
-    job_id = os.getenv("SLURM_JOB_ID")
 
     for lan in langs:
         print(f"Training the model for the language {lan}...")
@@ -284,8 +284,10 @@ if __name__ == "__main__":
 
     start_time = time.time()
 
+    job_id = os.getenv("SLURM_JOB_ID")
+
     if args.hs == False:
-        train_models(args, ds)
+        train_models(args, ds, job_id)
 
     if args.hs == True:
         epochs = [1, 3, 5, 10]
@@ -296,6 +298,35 @@ if __name__ == "__main__":
         arrays = [epochs, lr, eval_strategy, batch_size, weight_decay]
         combinations = generate_combinations(*arrays)
 
+        path = os.path.join(args.output_path, args.old_run) if args.old_run != "False" else None
+        prior_executions = pd.read_csv(path) if path is not None else None
+
+        if prior_executions is not None:
+            assert prior_executions["info"].tolist()[0].split("_")[1] == args.model, \
+            f"Expected model '{args.model}', but got '{prior_executions['info'].tolist()[0].split('_')[1]}'." \
+            f" Most likely passed the wrong old run file"
+            # removing the last experiment, since it might not be fully completed
+            prior_executions = prior_executions[:-1]
+
+            info_list = prior_executions["info"].tolist()
+            info_list = [tuple(execution.split("_")[2:]) for execution in info_list]
+
+            for index, execution in enumerate(info_list):
+                print(execution)
+                info_list[index] = (int(execution[1]), float(execution[3]), execution[4], int(execution[0]), float(execution[2]) if execution[2] != "0" else int(execution[2]))
+
+            c_old_len = len(combinations)
+
+            combinations = [item for item in combinations if item not in info_list]
+
+            assert c_old_len - len(combinations) == len(prior_executions), "Skipping of experiments was not calculated " \
+                                                                           "correctly..."
+
+            path = os.path.join(args.output_path, f"all_results_{job_id}.csv")
+            prior_executions.to_csv(path, index=False)
+
+            print(f"Skipped {len(prior_executions)} number of experiments!")
+
         for index, combination in enumerate(combinations):
             args.epochs = combination[0]         # overwrites the parameter
             args.lr = combination[1]             # overwrites the parameter
@@ -305,7 +336,7 @@ if __name__ == "__main__":
 
             print(f"Execution number {index+1} out of {len(combinations)}")
 
-            train_models(args, ds)
+            train_models(args, ds, job_id)
 
     end_time = time.time()
 
