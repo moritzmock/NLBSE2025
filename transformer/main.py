@@ -312,7 +312,6 @@ if __name__ == "__main__":
             info_list = [tuple(execution.split("_")[2:]) for execution in info_list]
 
             for index, execution in enumerate(info_list):
-                print(execution)
                 info_list[index] = (int(execution[1]), float(execution[3]), execution[4], int(execution[0]), float(execution[2]) if execution[2] != "0" else int(execution[2]))
 
             c_old_len = len(combinations)
