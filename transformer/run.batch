@@ -6,7 +6,7 @@
 #SBATCH --partition=gpu-low #cluster partition to use, you may not have access to this one
 #SBATCH --ntasks-per-node=1 # use four cores
 #SBATCH --nodes=1 # use a single cluster node
-#SBATCH --mem=16G
+#SBATCH --mem=64G
 #SBATCH --time=15-0:00:00
 #SBATCH --gres=gpu:v100
 #SBATCH --account=ml-vuln
