@@ -91,15 +91,20 @@ def str2bool(value):
 
 
 class WeightedBCELoss(nn.Module):
-    def __init__(self, weights):
+    def __init__(self, weights, weighted_loss):
         super(WeightedBCELoss, self).__init__()
         self.weights = weights
-        self.bce = nn.BCEWithLogitsLoss(reduction='none' if self.weights == [1] * len(weights) else "mean")  # no reduction to apply weights per label
+        # Flag indicating if weighted loss is activated or not
+        self.weighted_loss = False if weighted_loss == "no" else True
+        # no reduction to apply weights per label
+        self.bce = nn.BCEWithLogitsLoss(reduction='mean' if self.weighted_loss else "none")
 
     def forward(self, logits, labels):
         loss = self.bce(logits, labels)  # Calculate unweighted BCE loss
-        weighted_loss = loss * self.weights  # Apply weights to each label's loss
-        return weighted_loss.mean()
+        if self.weighted_loss:
+            weighted_loss = loss * self.weights  # Apply weights to each label's loss
+            return weighted_loss.mean()
+        return loss
 
 
 def create_path_structure(path, clear):
@@ -216,7 +221,7 @@ def train_models(args, ds, job_id):
 
         label_weights = torch.tensor(generate_weights(args.weighted_loss, train))
 
-        custom_loss = WeightedBCELoss(weights=label_weights)
+        custom_loss = WeightedBCELoss(weights=label_weights, weighted_loss=args.weighted_loss)
 
         class CustomTrainer(Trainer):
             def compute_loss(self, model, inputs, return_outputs=False):
