@@ -164,6 +164,9 @@ def read_args():
     parser.add_argument("--hs", default=True, type=str2bool, help="If true, the hyperparameters are overwritten")
     parser.add_argument("--old-run", default="False", type=str,
                         help="Passing the csv file of an old run allows to skip executed experiments")
+    parser.add_argument("--jobID-manual", default=None, required=False,
+                        help="If the script is not executed in a SLURM environment, the job ID can be passed "
+                             "to keep manually track of the multiple executions at the same time")
     parser.add_argument("--model", default="roberta-base")
     parser.add_argument("--batch_size", default=8)
     parser.add_argument("--epochs", default=3)
@@ -284,7 +287,10 @@ if __name__ == "__main__":
 
     start_time = time.time()
 
-    job_id = os.getenv("SLURM_JOB_ID")
+    job_id = os.getenv("SLURM_JOB_ID") if os.getenv("SLURM_JOB_ID") is not None else args.jobID_manual
+
+    assert job_id is not None, \
+        f"The script is not executed in an SLURM environment and/or no '--jobID-manual' parameter was passed"
 
     if args.hs == False:
         train_models(args, ds, job_id)
