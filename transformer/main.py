@@ -9,7 +9,7 @@ from datasets import load_dataset, Dataset
 import re
 from itertools import product
 import numpy as np
-import torch
+import torch, torch.nn as nn
 
 
 def generate_combinations(*arrays):
@@ -90,15 +90,16 @@ def str2bool(value):
         raise argparse.ArgumentTypeError("Boolean value expected.")
 
 
-class CustomTrainer(Trainer):
-    def compute_loss(self, model, inputs, return_outputs=False):
-        labels = inputs.get("labels")
-        # Convert labels to float if needed
-        if labels is not None:
-            inputs["labels"] = labels.float()
-        outputs = model(**inputs)
-        loss = outputs.get("loss") if isinstance(outputs, dict) else outputs[0]
-        return (loss, outputs) if return_outputs else loss
+class WeightedBCELoss(nn.Module):
+    def __init__(self, weights):
+        super(WeightedBCELoss, self).__init__()
+        self.weights = weights
+        self.bce = nn.BCEWithLogitsLoss(reduction='none' if self.weights == [1] * len(weights) else "mean")  # no reduction to apply weights per label
+
+    def forward(self, logits, labels):
+        loss = self.bce(logits, labels)  # Calculate unweighted BCE loss
+        weighted_loss = loss * self.weights  # Apply weights to each label's loss
+        return weighted_loss.mean()
 
 
 def create_path_structure(path, clear):
@@ -173,8 +174,31 @@ def read_args():
     parser.add_argument("--weight-decay", default=0.01)
     parser.add_argument("--lr", default=5e-5)
     parser.add_argument("--eval-strategy", default="no", choices=["no", "epoch"])
+    parser.add_argument("--weighted-loss", default="no", choices=["no", "yes"])
 
     return parser.parse_args()
+
+
+def generate_weights(weighted_loss, data):
+
+    if weighted_loss == "yes":
+        labels = data["labels"]
+        labels_array = np.array(labels)
+        class_counts = labels_array.sum(axis=0)
+        total_samples = len(labels)
+        class_frequencies = (class_counts/total_samples)*100
+        result = []
+
+        for i, freq in enumerate(class_frequencies):
+            result.append(round(1/freq, 2))
+
+        result = np.array(result)
+
+        return result * (1 / np.sum(result))
+
+
+    # NO WEIGHTED LOSS
+    return [1] * len(data[0]["labels"])
 
 
 def train_models(args, ds, job_id):
@@ -189,6 +213,18 @@ def train_models(args, ds, job_id):
 
         train = ds[f"{lan}_train"]
         test = ds[f"{lan}_test"]
+
+        label_weights = torch.tensor(generate_weights(args.weighted_loss, train))
+
+        custom_loss = WeightedBCELoss(weights=label_weights)
+
+        class CustomTrainer(Trainer):
+            def compute_loss(self, model, inputs, return_outputs=False):
+                labels = inputs.pop("labels").float()
+                outputs = model(**inputs)
+                logits = outputs.logits
+                loss = custom_loss(logits, labels)
+                return (loss, outputs) if return_outputs else loss
 
         model = RobertaForSequenceClassification.from_pretrained(args.model, num_labels=len(labels[lan]))
         model.config.problem_type = "multi_label_classification"
