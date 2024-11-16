@@ -49,8 +49,8 @@ def read_args():
     parser.add_argument("--eval-strategy", default="no", choices=["no", "epoch"])
     parser.add_argument("--weight-method-name", default="ls", choices=["ls", "wls","famo"])
     parser.add_argument("--gamma", type=float, default=0.01, help="gamma of famo")
-    parser.add_argument("--w_lr", type=float, default=0.025, help="lr for adma of famo")
-    parser.add_argument("--max_norm", type=float, default=1.0, help="beta for RMS_weight alg.")
+    parser.add_argument("--method-params-lr", type=float, default=0.025, help="lr for adma of famo")
+    parser.add_argument("--max-norm", type=float, default=1.0, help="beta for RMS_weight alg.")
 
 
     return parser.parse_args()
@@ -99,7 +99,7 @@ def train_models(args, ds, job_id, device):
             n_tasks=len(labels[lan]),
             device=device,
             task_weights = label_weights,
-            **weight_methods_parameters[args.method]
+            **weight_methods_parameters[args.weight_method_name]
         )
 
         print('set model')
