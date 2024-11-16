@@ -50,3 +50,4 @@ tzdata==2024.2
 urllib3==2.2.3
 xxhash==3.5.0
 yarl==1.17.0
+cvxpy==1.6.0
