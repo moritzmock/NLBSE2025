@@ -12,9 +12,10 @@ from itertools import product
 import numpy as np
 import torch, torch.nn as nn
 
-from MTL.utils import create_path_structure,rename_keys_with_regex,generate_information,str2bool,compute_metrics,generate_combinations
+from MTL.utils import create_path_structure,rename_keys_with_regex,generate_information,str2bool,compute_metrics,generate_combinations,extract_weight_method_parameters_from_args
 from MTL.weight_methods import WeightMethods
 from MTL.model import RobertaForSequenceMultiLabelClassification
+from MTL.trainer import CustomTrainer
 
 
 def tokenize(batch):
@@ -28,11 +29,6 @@ def modify_data(data):
     data = data.map(lambda x: {"labels": x["labels"].float()})
 
     return data
-
-
-
-
-
 
 def read_args():
     parser = argparse.ArgumentParser()
@@ -51,11 +47,13 @@ def read_args():
     parser.add_argument("--weight-decay", default=0.01)
     parser.add_argument("--lr", default=5e-5)
     parser.add_argument("--eval-strategy", default="no", choices=["no", "epoch"])
-    parser.add_argument("--weighted-loss", default="famo", choices=["ls", "wls","famo"])
+    parser.add_argument("--weight-method-name", default="ls", choices=["ls", "wls","famo"])
+    parser.add_argument("--gamma", type=float, default=0.01, help="gamma of famo")
+    parser.add_argument("--w_lr", type=float, default=0.025, help="lr for adma of famo")
+    parser.add_argument("--max_norm", type=float, default=1.0, help="beta for RMS_weight alg.")
 
 
     return parser.parse_args()
-
 
 def generate_weights(weighted_loss, data):
 
@@ -79,7 +77,7 @@ def generate_weights(weighted_loss, data):
     return [1] * len(data[0]["labels"])
 
 
-def train_models(args, ds, job_id):
+def train_models(args, ds, job_id, device):
     print(args)
 
     for lan in langs:
@@ -92,98 +90,22 @@ def train_models(args, ds, job_id):
         train = ds[f"{lan}_train"]
         test = ds[f"{lan}_test"]
 
-        label_weights = torch.tensor(generate_weights(args.weighted_loss, train))
-
-        # custom_loss = WeightedBCELoss(weights=label_weights, weighted_loss=args.weighted_loss)
-        # loss_fn   = nn.BCEWithLogitsLoss("none")
+        label_weights = torch.tensor(generate_weights(args.weight_method_name, train))
 
         # weight method
+        weight_methods_parameters = extract_weight_method_parameters_from_args(args)
         weight_method = WeightMethods(
-            args.weighted_loss, n_tasks=len(labels[lan]) ,device='cpu' #TODO set this to work generally
+            args.weight_method_name, 
+            n_tasks=len(labels[lan]),
+            device=device,
+            task_weights = label_weights,
+            **weight_methods_parameters[args.method]
         )
 
-        # class FAMOWeightedTrainer(Trainer):
-        #     def __init__(self, *args, loss_weight_manager, **kwargs):
-        #         super().__init__(*args, **kwargs)
-        #         self.loss_weight_manager = loss_weight_manager  # Instance of your loss weighting class
-
-        #     def compute_loss(self, model, inputs, return_outputs=False):
-        #         # Forward pass
-        #         outputs = model(**inputs)
-                
-        #         losses = outputs.get("losses")  # List of losses for each task
-        #         if not isinstance(losses, list):
-        #             raise ValueError("Model must return a list of losses.")
-
-        #         # Get dynamic weights from the manager
-        #         task_weights = self.loss_weight_manager.get_weights()
-
-        #         # Apply weights to the losses
-        #         weighted_loss = 0.0
-        #         for i, loss in enumerate(losses):
-        #             weight = task_weights.get(i, 1.0)  # Default weight is 1.0
-        #             weighted_loss += weight * loss
-
-        #         return (weighted_loss, outputs) if return_outputs else weighted_loss
-
-        #     def training_step(self, model, inputs):
-        #         # Perform the regular training step
-        #         loss = super().training_step(model, inputs)
-
-        #         # Update the weights dynamically after the step
-        #         self.loss_weight_manager.update()
-
-        #         return loss
-            
-
-        class CustomTrainer(Trainer):
-            def __init__(self, *args, weight_method, alpha, **kwargs):
-                super().__init__(*args, **kwargs)
-                self.weight_method = weight_method
-                self.alpha = alpha
-
-            def training_step(self, model, inputs):
-                """
-                Perform a custom training step.
-                """
-                # Move inputs to device
-                inputs = {k: v.to(self.args.device) for k, v in inputs.items()}
-                labels = inputs.pop("labels")  # Assuming 'labels' is part of the dataset
-
-                # Forward pass
-                model.train()
-                outputs = model(**inputs)
-                loss_fct = nn.BCEWithLogitsLoss(reduction='none')
-                
-                if labels.dtype != torch.float:
-                   labels=labels.float()
-                print(f"training step logist:{outputs.get("logits").shape} ,labels: {labels.shape}")
-                losses = loss_fct(outputs.get("logits").squeeze(), labels.squeeze())
-                print(f"training step outputs: {losses}")
-
-                # Apply custom backward method with weighted losses
-                total_loss, extra_outputs = self.weight_method.backward(
-                    losses=losses * self.alpha
-                )
-
-                # Perform optimizer step
-                self.optimizer.zero_grad()
-                # total_loss.backward()
-                self.optimizer.step()
-
-                # Update weight method if required
-                with torch.no_grad():
-                    # Forward pass again for updated losses
-                    train_pred = model(**inputs)
-                    new_losses = loss_fct(train_pred.get("logits").squeeze(), labels.squeeze())
-                    self.weight_method.method.update(new_losses.detach())
-
-                return total_loss
-        
         print('set model')
         model = RobertaForSequenceMultiLabelClassification.from_pretrained(args.model, num_labels=len(labels[lan]))
         model.config.problem_type = "multi_label_classification"
-
+        model.to(device)
         print("Model was loaded successfully!")
 
         train_data_complete = modify_data(train)
@@ -211,7 +133,7 @@ def train_models(args, ds, job_id):
         trainer = CustomTrainer(
             model=model,
             weight_method=weight_method,
-            alpha=0.2,
+            weight_method_name=args.weight_method_name,
             args=training_args,
             train_dataset=train_data,
             eval_dataset=val_data,
@@ -262,6 +184,10 @@ def convert_duration(seconds):
 if __name__ == "__main__":
     args = read_args()
     print(args)
+    
+    # Specify the device
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"trainig in: {device}")
 
     langs = ['java', 'python', 'pharo']
     labels = {
@@ -280,13 +206,13 @@ if __name__ == "__main__":
 
     start_time = time.time()
 
-    job_id = 1 #os.getenv("SLURM_JOB_ID") if os.getenv("SLURM_JOB_ID") is not None else args.jobID_manual
+    job_id = os.getenv("SLURM_JOB_ID") if os.getenv("SLURM_JOB_ID") is not None else args.jobID_manual
 
     assert job_id is not None, \
         f"The script is not executed in an SLURM environment and/or no '--jobID-manual' parameter was passed"
 
     if args.hs == False:
-        train_models(args, ds, job_id)
+        train_models(args, ds, job_id,device)
 
     if args.hs == True:
         epochs = [1, 3, 5, 10]
@@ -334,7 +260,7 @@ if __name__ == "__main__":
 
             print(f"Execution number {index+1} out of {len(combinations)}")
 
-            train_models(args, ds, job_id)
+            train_models(args, ds, job_id,device)
 
     end_time = time.time()
 

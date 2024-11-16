@@ -1,6 +1,7 @@
 import argparse
 import os.path
 import shutil
+from collections import defaultdict
 
 import re
 from itertools import product
@@ -127,3 +128,15 @@ def generate_information(args, jobID):
            f"{args.weight_decay}_" \
            f"{args.lr}_" \
            f"{args.eval_strategy}"
+
+
+def extract_weight_method_parameters_from_args(args):
+    weight_methods_parameters = defaultdict(dict)
+    weight_methods_parameters.update(
+        dict(
+            famo=dict(gamma=args.gamma,
+                      w_lr=args.method_params_lr,
+                      max_norm=args.max_norm),
+        )
+    )
+    return weight_methods_parameters
