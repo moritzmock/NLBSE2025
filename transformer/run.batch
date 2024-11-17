@@ -44,4 +44,4 @@ EOF
 
 nvidia-smi
 
-python main.py --output-path /data/users/momock/NLBSE25/results --model "$1" --hs True --old-run "$2"
+python main.py --output-path /data/users/momock/NLBSE25/results/SetFit --model "$1" --hs True --old-run "$2"
