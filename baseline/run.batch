@@ -44,4 +44,4 @@ EOF
 
 nvidia-smi
 
-python main_reimplementation.py
+python main.py
