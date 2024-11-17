@@ -238,7 +238,7 @@ def train_models(args, ds, job_id):
             model=model,
             num_epochs=args.epochs,
             train_dataset=train_data,
-            val_data=val_data,
+            eval_dataset=val_data,
             column_mapping={"combo": "text", "labels": "label"},
             batch_size=args.batch_size,
             learning_rate=args.lr
