@@ -66,7 +66,7 @@ def compute_metrics(eval_pred):
 
 
 def tokenize(batch):
-    return tokenizer(batch["text"], padding=True, truncation=True, max_length=128)
+    return tokenizer(batch["text"], padding=True, truncation=True, max_length=512)
 
 
 def modify_data(data):
