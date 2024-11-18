@@ -1,6 +1,6 @@
 from transformers import Trainer
 import torch, torch.nn as nn
-
+# test
 class CustomTrainer(Trainer):
             def __init__(self, *args, weight_method, weight_method_name, **kwargs):
                 super().__init__(*args, **kwargs)
