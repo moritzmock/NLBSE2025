@@ -6,6 +6,7 @@ class CustomTrainer(Trainer):
                 super().__init__(*args, **kwargs)
                 self.weight_method = weight_method
                 self.weight_method_name = weight_method_name
+                self.global_step = 0
 
             def training_step(self, model, inputs):
                 """
@@ -19,16 +20,28 @@ class CustomTrainer(Trainer):
                 self.optimizer.zero_grad()
                 model.train()
                 outputs = model(**inputs)
-                loss_fct = nn.BCEWithLogitsLoss(reduction='none')
+                loss_fct = nn.BCEWithLogitsLoss()
                 
                 if labels.dtype != torch.float:
                    labels=labels.float()
-                losses = loss_fct(outputs.get("logits").squeeze(), labels.squeeze())
 
+                losses = loss_fct(outputs.get("logits").squeeze(), labels.squeeze())
+                if losses.dim() > 1:  # Check if batch dim s greater than 1
+                    per_sample_loss = losses.mean(dim=1)  # Compute mean across heads for each sample
+                else:
+                    per_sample_loss = losses
+                
                 # Apply custom backward method with weighted losses
                 total_loss, extra_outputs = self.weight_method.backward(
-                    losses=losses
+                    losses=per_sample_loss
                 )
+                
+                # Print every 500 steps
+                self.global_step += 1
+                if self.global_step % 500 == 0:
+                    print(f"\nStep {self.global_step}: Collected Extra Outputs:")
+                    for key, value in extra_outputs.items():
+                        print(f"{key}: {value}")
 
                 # Perform optimizer step
                 self.optimizer.step()
@@ -38,6 +51,11 @@ class CustomTrainer(Trainer):
                         # Forward pass again for updated losses
                         train_pred = model(**inputs)
                         new_losses = loss_fct(train_pred.get("logits").squeeze(), labels.squeeze())
-                        self.weight_method.method.update(new_losses.detach())
+                        if losses.dim() > 1:  # Check if batch dim s greater than 1
+                            per_sample_new_losses = new_losses.mean(dim=1)  # Compute mean across heads for each sample
+                        else:
+                            per_sample_new_losses = new_losses
+                        
+                        self.weight_method.method.update(per_sample_new_losses.detach())
 
                 return total_loss

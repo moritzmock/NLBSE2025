@@ -75,10 +75,8 @@ class RobertaMultiHeadClassification(nn.Module):
 
     def forward(self, features, **kwargs):
         x = features[:, 0, :]  # take <s> token (equiv. to [CLS])
-        x = self.dropout(x)
         x = self.dense(x)
         x = torch.tanh(x)
-        x = self.dropout(x)
         # Apply each output projection head independently
         outputs = [head(x) for head in self.out_projs]
         # Concatenate the outputs along the last dimension
@@ -167,9 +165,7 @@ class RobertaForSequenceMultiLabelClassification(RobertaPreTrainedModel):
                 
                 if labels.dtype != torch.float:
                    labels=labels.float()
-                print(f"model forward loop logist:{logits} ,labels: {labels}")
                 loss = loss_fct(logits, labels)
-                print(f"model forward loop loss:{loss} ")
 
         if not return_dict:
             output = (logits,) + outputs[2:]

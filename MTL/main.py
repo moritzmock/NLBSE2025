@@ -49,8 +49,8 @@ def read_args():
     parser.add_argument("--eval-strategy", default="no", choices=["no", "epoch"])
     parser.add_argument("--weight-method-name", default="ls", choices=["ls", "wls","famo"])
     parser.add_argument("--gamma", type=float, default=0.01, help="gamma of famo")
-    parser.add_argument("--w_lr", type=float, default=0.025, help="lr for adma of famo")
-    parser.add_argument("--max_norm", type=float, default=1.0, help="beta for RMS_weight alg.")
+    parser.add_argument("--method-params-lr", type=float, default=0.025, help="lr for adma of famo")
+    parser.add_argument("--max-norm", type=float, default=1.0, help="beta for RMS_weight alg.")
 
 
     return parser.parse_args()
@@ -99,11 +99,11 @@ def train_models(args, ds, job_id, device):
             n_tasks=len(labels[lan]),
             device=device,
             task_weights = label_weights,
-            **weight_methods_parameters[args.method]
+            **weight_methods_parameters[args.weight_method_name]
         )
 
         print('set model')
-        model = RobertaForSequenceMultiLabelClassification.from_pretrained(args.model, num_labels=len(labels[lan]))
+        model = RobertaForSequenceMultiLabelClassification.from_pretrained(args.model, num_labels=len(labels[lan]),cache_dir = "MTL/model")
         model.config.problem_type = "multi_label_classification"
         model.to(device)
         print("Model was loaded successfully!")
@@ -123,9 +123,11 @@ def train_models(args, ds, job_id, device):
             num_train_epochs=args.epochs,
             weight_decay=args.weight_decay,
             learning_rate=args.lr,
-            logging_dir=f"{args.output_path}/{job_id}/{lan}/logs"
+            logging_dir=f"{args.output_path}/{job_id}/{lan}/logs",
+            load_best_model_at_end=True, 
+            save_strategy = "no"
         )
-
+        # TODO check chekpoint strategy if going in slurm
         print("TrainingArguments were created successfully!")
 
         data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
@@ -145,6 +147,7 @@ def train_models(args, ds, job_id, device):
 
         trainer.train()
 
+        # TODO how famo save weights?
         trainer.save_model(f"{args.output_path}/{job_id}/{lan}/models")
 
         result = trainer.evaluate(eval_dataset=test_data)
@@ -166,7 +169,10 @@ def train_models(args, ds, job_id, device):
             csv_data.loc[index, key] = result[key]
 
         csv_data.to_csv(path, index=False)
-
+        try:
+            print(f"weights: {weight_method.w}")
+        except:
+            print(f"weights: {weight_method}")
         print("---------------------")
 
 
