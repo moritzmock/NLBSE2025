@@ -7,7 +7,8 @@ import re
 from itertools import product
 import numpy as np
 import torch
-
+import random
+from transformers import set_seed
 
 def generate_combinations(*arrays):
     return list(product(*arrays))
@@ -61,7 +62,23 @@ def compute_metrics(eval_pred):
 
     return class_metrics
 
+def set_seed(seed):
+    """for reproducibility
+    :param seed:
+    :return:
+    """
+    np.random.seed(seed)
+    random.seed(seed)
+    set_seed(seed)
 
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+
+    torch.backends.cudnn.enabled = True
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cudnn.deterministic = True
 
 def str2bool(value):
     if isinstance(value, bool):
