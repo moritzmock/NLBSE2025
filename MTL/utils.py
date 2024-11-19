@@ -8,7 +8,6 @@ from itertools import product
 import numpy as np
 import torch
 import random
-from transformers import set_seed
 
 def generate_combinations(*arrays):
     return list(product(*arrays))
@@ -69,7 +68,6 @@ def set_seed(seed):
     """
     np.random.seed(seed)
     random.seed(seed)
-    set_seed(seed)
 
     torch.manual_seed(seed)
     if torch.cuda.is_available():

@@ -154,6 +154,7 @@ class FAMO(WeightMethod):
     def get_weighted_loss(self, losses, **kwargs):
         self.prev_loss = losses
         z = F.softmax(self.w, -1)
+        
         D = losses - self.min_losses + 1e-8
         c = (z / D).sum().detach()
         loss = (D.log() * z / c).sum()
@@ -162,6 +163,7 @@ class FAMO(WeightMethod):
     def update(self, curr_loss):
         delta = (self.prev_loss - self.min_losses + 1e-8).log() - \
                 (curr_loss      - self.min_losses + 1e-8).log()
+        
         with torch.enable_grad():
             d = torch.autograd.grad(F.softmax(self.w, -1),
                                     self.w,

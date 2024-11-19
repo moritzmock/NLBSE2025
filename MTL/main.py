@@ -4,7 +4,7 @@ import shutil
 import time
 import pandas as pd
 from transformers import RobertaTokenizer, RobertaConfig, Trainer, TrainingArguments, \
-    DataCollatorWithPadding
+    DataCollatorWithPadding, RobertaForSequenceClassification
 from transformers.modeling_outputs import SequenceClassifierOutput
 from datasets import load_dataset, Dataset
 import re
@@ -50,12 +50,13 @@ def read_args():
                         help="If the script is not executed in a SLURM environment, the job ID can be passed "
                              "to keep manually track of the multiple executions at the same time")
     parser.add_argument("--model", default="roberta-base")
+    parser.add_argument("--multi-head", default="no", choices=["no", "yes"])
     parser.add_argument("--batch_size", default=8)
     parser.add_argument("--epochs", default=3)
     parser.add_argument("--weight-decay", default=0.01)
     parser.add_argument("--lr", default=5e-5)
     parser.add_argument("--eval-strategy", default="no", choices=["no", "epoch"])
-    parser.add_argument("--weight-method-name", default="ls", choices=["ls", "wls","famo"])
+    parser.add_argument("--weight-method-name", default="famo", choices=["ls", "wls","famo"])
     parser.add_argument("--gamma", type=float, default=0.01, help="gamma of famo")
     parser.add_argument("--method-params-lr", type=float, default=0.025, help="lr for adma of famo")
     parser.add_argument("--max-norm", type=float, default=1.0, help="beta for RMS_weight alg.")
@@ -111,7 +112,11 @@ def train_models(args, ds, job_id, device):
         )
 
         print('set model')
-        model = RobertaForSequenceMultiLabelClassification.from_pretrained(args.model, num_labels=len(labels[lan]),cache_dir = "MTL/model")
+        if args.multi_head != 'no':
+            model = RobertaForSequenceMultiLabelClassification.from_pretrained(args.model, num_labels=len(labels[lan]),cache_dir = "MTL/model")
+        else :
+            model = RobertaForSequenceClassification.from_pretrained(args.model, num_labels=len(labels[lan]))
+            
         model.config.problem_type = "multi_label_classification"
         model.to(device)
         print("Model was loaded successfully!")
@@ -158,6 +163,7 @@ def train_models(args, ds, job_id, device):
         # TODO how famo save weights?
         # HACK model not saved 
         # trainer.save_model(f"{args.output_path}/{job_id}/{lan}/models")
+
 
         result = trainer.evaluate(eval_dataset=test_data)
 
@@ -235,7 +241,7 @@ if __name__ == "__main__":
         epochs = [1, 3, 5, 10]
         lr = [ 3e-5, 4e-5, 5e-5] #1e-5, 2e-5,
         eval_strategy = ["no"]
-        batch_size = [1, 2, 4, 8, 16]
+        batch_size = [32,16,8,4,2,1]
         weight_decay = [0, 0.01, 0.001]
         gamma = [0.01,0.001,0.0001]
         arrays = [epochs, lr, eval_strategy, batch_size, weight_decay,gamma]

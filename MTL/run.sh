@@ -32,4 +32,7 @@ EOF
 
 nvidia-smi
 
-python MTL/main.py --output-path /results --model "$1" --hs True --old-run "$2" --weight-method-name 'famo'
+python MTL/main.py --output-path ./results --model "roberta-base" --hs True --weight-method-name 'famo' --jobID-manual=011101001 
+python MTL/main.py --output-path ./results --model='distilroberta-base' --hs True --weight-method-name 'famo' --jobID-manual=011101002 
+python MTL/main.py --output-path ./results --model "microsoft/codebert-base" --hs True --weight-method-name 'famo' --jobID-manual=011101003 
+python MTL/main.py --output-path ./results --model "microsoft/unixcoder-base" --hs True --weight-method-name 'famo' --jobID-manual=011101004 
