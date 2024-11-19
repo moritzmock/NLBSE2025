@@ -154,10 +154,9 @@ class FAMO(WeightMethod):
     def get_weighted_loss(self, losses, **kwargs):
         self.prev_loss = losses
         z = F.softmax(self.w, -1)
-        
         D = losses - self.min_losses + 1e-8
         c = (z / D).sum().detach()
-        loss = (D.log() * z / c).sum()
+        loss = abs(D.log() * z / c).sum()
         return loss, {"weights": z, "logits": self.w.detach().clone()}
 
     def update(self, curr_loss):
