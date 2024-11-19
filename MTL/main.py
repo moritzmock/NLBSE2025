@@ -19,7 +19,7 @@ from MTL.trainer import CustomTrainer
 
 
 def tokenize(batch):
-    return tokenizer(batch["text"], padding=True, truncation=True, max_length=128)
+    return tokenizer(batch["text"], padding=True, truncation=True, max_length=512)
 
 def modify_data(data):
     data = Dataset.from_dict({"text": data["combo"], "labels": data["labels"]})
