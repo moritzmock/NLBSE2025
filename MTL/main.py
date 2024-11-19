@@ -164,7 +164,7 @@ def train_models(args, ds, job_id, device):
         # HACK model not saved 
         # trainer.save_model(f"{args.output_path}/{job_id}/{lan}/models")
 
-
+            
         result = trainer.evaluate(eval_dataset=test_data)
 
         result = rename_keys_with_regex(result, "eval_", "eval_" + lan + "_")
@@ -184,10 +184,6 @@ def train_models(args, ds, job_id, device):
             csv_data.loc[index, key] = result[key]
 
         csv_data.to_csv(path, index=False)
-        try:
-            print(f"weights: {weight_method.w}")
-        except:
-            print(f"weights: {weight_method}")
         print("---------------------")
 
 
