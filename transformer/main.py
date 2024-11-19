@@ -358,8 +358,8 @@ if __name__ == "__main__":
 
     if args.hs == True:
         epochs = [1, 3, 5, 10]
-        lr = [1e-5, 2e-5, 3e-5, 4e-5, 5e-5]
-        eval_strategy = ["no", "epoch"]
+        lr = [3e-5, 4e-5, 5e-5] # 1e-5, 2e-5, 
+        eval_strategy = ["no"]
         batch_size = [1, 2, 4, 8, 16]
         weight_decay = [0, 0.01, 0.001]
         arrays = [epochs, lr, eval_strategy, batch_size, weight_decay]
