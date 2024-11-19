@@ -1,5 +1,6 @@
 import argparse
 import os.path
+import random
 import shutil
 import time
 import pandas as pd
@@ -307,7 +308,26 @@ def convert_duration(seconds):
     return f"{days}-{hours}-{minutes}-{seconds}"
 
 
+def set_seed(seed):
+    """for reproducibility
+    :param seed:
+    :return:
+    """
+    np.random.seed(seed)
+    random.seed(seed)
+
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+
+    torch.backends.cudnn.enabled = True
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cudnn.deterministic = True
+
+
 if __name__ == "__main__":
+    set_seed(42)
     args = read_args()
     print(args)
 
