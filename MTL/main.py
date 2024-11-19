@@ -12,7 +12,15 @@ from itertools import product
 import numpy as np
 import torch, torch.nn as nn
 
-from MTL.utils import create_path_structure,rename_keys_with_regex,generate_information,str2bool,compute_metrics,generate_combinations,extract_weight_method_parameters_from_args
+from MTL.utils import (
+    create_path_structure,
+    rename_keys_with_regex,
+    generate_information,
+    str2bool,
+    compute_metrics,
+    generate_combinations,
+    extract_weight_method_parameters_from_args,
+    set_seed)
 from MTL.weight_methods import WeightMethods
 from MTL.model import RobertaForSequenceMultiLabelClassification
 from MTL.trainer import CustomTrainer
@@ -51,7 +59,7 @@ def read_args():
     parser.add_argument("--gamma", type=float, default=0.01, help="gamma of famo")
     parser.add_argument("--method-params-lr", type=float, default=0.025, help="lr for adma of famo")
     parser.add_argument("--max-norm", type=float, default=1.0, help="beta for RMS_weight alg.")
-
+    parser.add_argument("--seed", type=int, default=42, help="set seed for reproducibility")
 
     return parser.parse_args()
 
@@ -79,7 +87,7 @@ def generate_weights(weighted_loss, data):
 
 def train_models(args, ds, job_id, device):
     print(args)
-
+    set_seed(42)
     for lan in langs:
         print(f"Training the model for the language {lan}...")
 
@@ -190,7 +198,9 @@ def convert_duration(seconds):
 if __name__ == "__main__":
     args = read_args()
     print(args)
-    
+
+    set_seed(args.seed)
+
     # Specify the device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"trainig in: {device}")
@@ -227,7 +237,7 @@ if __name__ == "__main__":
         batch_size = [1, 2, 4, 8, 16]
         weight_decay = [0, 0.01, 0.001]
         gamma = [0.01,0.001,0.0001]
-        arrays = [epochs, lr, eval_strategy, batch_size, weight_decay]
+        arrays = [epochs, lr, eval_strategy, batch_size, weight_decay,gamma]
         combinations = generate_combinations(*arrays)
 
         path = os.path.join(args.output_path, args.old_run) if args.old_run != "False" else None
