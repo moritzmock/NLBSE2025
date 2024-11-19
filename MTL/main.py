@@ -135,7 +135,7 @@ def train_models(args, ds, job_id, device):
             load_best_model_at_end=True, 
             save_strategy = "no"
         )
-        # TODO check chekpoint strategy if going in slurm
+        # HACK check chekpoint strategy if going in slurm
         print("TrainingArguments were created successfully!")
 
         data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
@@ -156,7 +156,8 @@ def train_models(args, ds, job_id, device):
         trainer.train()
 
         # TODO how famo save weights?
-        trainer.save_model(f"{args.output_path}/{job_id}/{lan}/models")
+        # HACK model not saved 
+        # trainer.save_model(f"{args.output_path}/{job_id}/{lan}/models")
 
         result = trainer.evaluate(eval_dataset=test_data)
 
