@@ -365,7 +365,10 @@ if __name__ == "__main__":
         arrays = [epochs, lr, eval_strategy, batch_size, weight_decay]
         combinations = generate_combinations(*arrays)
 
+        print(args.old_run)
+
         path = os.path.join(args.output_path, args.old_run) if args.old_run != "False" else None
+        print(path)
         prior_executions = pd.read_csv(path) if path is not None else None
 
         if prior_executions is not None:
