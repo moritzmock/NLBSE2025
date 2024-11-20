@@ -92,7 +92,7 @@ def str2bool(value):
 
 
 class WeightedBCELoss(nn.Module):
-    def __init__(self, weights, weighted_loss):
+    def __init__(self, weights):
         super(WeightedBCELoss, self).__init__()
         self.weights = weights
         self.bce = nn.BCEWithLogitsLoss(reduction="none")
