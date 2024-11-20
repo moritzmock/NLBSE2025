@@ -12,6 +12,25 @@ from itertools import product
 import numpy as np
 import torch, torch.nn as nn
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+# Check the number of available GPUs
+num_gpus = torch.cuda.device_count()
+
+# Print details about each device
+print("Available devices:")
+for i in range(num_gpus):
+    print(f"Device {i}: {torch.cuda.get_device_name(i)}")
+
+# Check if CUDA is available
+if num_gpus == 0:
+    print("No CUDA devices available. Defaulting to CPU.")
+else:
+    print(f"Number of GPUs available: {num_gpus}")
+
+# Check the current device
+print(f"Current device: {torch.cuda.current_device()}")
+
 
 def generate_combinations(*arrays):
     return list(product(*arrays))
@@ -75,6 +94,7 @@ def modify_data(data):
     data = data.map(tokenize, batched=True)
     data.set_format(type="torch", columns=["input_ids", "attention_mask", "labels"])
     data = data.remove_columns(['text'])
+    # data = data.map(lambda x: {key: val.to(device) for key, val in x.items()})
     data = data.map(lambda x: {"labels": x["labels"].float()})
 
     return data
@@ -94,11 +114,15 @@ def str2bool(value):
 class WeightedBCELoss(nn.Module):
     def __init__(self, weights):
         super(WeightedBCELoss, self).__init__()
-        self.weights = weights
+        self.weights = torch.tensor(weights, device=device)
         self.bce = nn.BCEWithLogitsLoss(reduction="none")
 
     def forward(self, logits, labels):
+        logits = logits.to(device)
+        labels = labels.to(device)
+
         loss = self.bce(logits, labels)  # Calculate unweighted BCE loss
+
         weighted_loss = loss * self.weights  # Apply weights to each label's loss
         return weighted_loss.mean()
 
@@ -221,7 +245,10 @@ def train_models(args, ds, job_id):
 
         class CustomTrainer(Trainer):
             def compute_loss(self, model, inputs, return_outputs=False):
-                labels = inputs.pop("labels").float()
+                labels = inputs.pop("labels").float().to(device)  # Move labels to the global device
+                inputs = {key: val.to(device) for key, val in inputs.items()}  # Move inputs to global device
+
+                #labels = inputs.pop("labels").float()
                 outputs = model(**inputs)
                 logits = outputs.logits
                 loss = custom_loss(logits, labels)
@@ -229,6 +256,7 @@ def train_models(args, ds, job_id):
 
         model = RobertaForSequenceClassification.from_pretrained(args.model, num_labels=len(labels[lan]))
         model.config.problem_type = "multi_label_classification"
+        model = model.to(device)
 
         print("Model was loaded successfully!")
 
