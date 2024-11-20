@@ -94,8 +94,8 @@ def modify_data(data):
     data = data.map(tokenize, batched=True)
     data.set_format(type="torch", columns=["input_ids", "attention_mask", "labels"])
     data = data.remove_columns(['text'])
-    # data = data.map(lambda x: {key: val.to(device) for key, val in x.items()})
-    data = data.map(lambda x: {"labels": x["labels"].float()})
+    data = data.map(lambda x: {key: val.to(device) for key, val in x.items()})
+    # data = data.map(lambda x: {"labels": x["labels"].float()})
 
     return data
 
