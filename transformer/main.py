@@ -11,6 +11,7 @@ import re
 from itertools import product
 import numpy as np
 import torch, torch.nn as nn
+import math
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -112,8 +113,9 @@ def str2bool(value):
 
 
 class WeightedBCELoss(nn.Module):
-    def __init__(self, weights):
+    def __init__(self, weights, weighted_loss):
         super(WeightedBCELoss, self).__init__()
+        self.weighted_loss = weighted_loss
         self.weights = torch.tensor(weights, device=device)
         self.bce = nn.BCEWithLogitsLoss(reduction="none")
 
@@ -123,7 +125,13 @@ class WeightedBCELoss(nn.Module):
 
         loss = self.bce(logits, labels)  # Calculate unweighted BCE loss
 
-        weighted_loss = loss * self.weights  # Apply weights to each label's loss
+        weighted_loss = None
+
+        if self.weighted_loss == "yes": # naive implementation
+            weighted_loss = np.array(loss) / math.log10(len(self.weights))
+        else:
+            weighted_loss = loss * self.weights  # Apply weights to each label's loss
+
         return weighted_loss.mean()
 
 
@@ -206,6 +214,8 @@ def read_args():
 
 def generate_weights(weighted_loss, data):
 
+    '''
+
     if weighted_loss == "yes":
         labels = data["labels"]
         labels_array = np.array(labels)
@@ -220,6 +230,8 @@ def generate_weights(weighted_loss, data):
         result = np.array(result)
 
         return result * (1 / np.sum(result))
+
+    '''
 
 
     # NO WEIGHTED LOSS
@@ -241,7 +253,7 @@ def train_models(args, ds, job_id):
 
         label_weights = torch.tensor(generate_weights(args.weighted_loss, train))
 
-        custom_loss = WeightedBCELoss(weights=label_weights)
+        custom_loss = WeightedBCELoss(weights=label_weights, weighted_loss=args.weighted_loss)
 
         class CustomTrainer(Trainer):
             def compute_loss(self, model, inputs, return_outputs=False):
