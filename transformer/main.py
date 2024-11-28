@@ -199,7 +199,7 @@ def read_args():
     parser.add_argument("--weight-decay", default=0.01)
     parser.add_argument("--lr", default=5e-5)
     parser.add_argument("--eval-strategy", default="no", choices=["no", "epoch"])
-    parser.add_argument("--weighted-loss", default="no", choices=["no", "yes"])
+    parser.add_argument("--weighted-loss", default="yes", choices=["no", "yes"])
 
     return parser.parse_args()
 
