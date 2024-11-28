@@ -1,0 +1,40 @@
+#!/bin/bash
+
+#SBATCH -A IscrC_AGEND
+#SBATCH -p boost_usr_prod
+#SBATCH --time 4-0:00:00      # format: HH:MM:SS
+#SBATCH -N 1                  # 1 node
+#SBATCH --ntasks-per-node=1   # 1 tasks out of 32
+#SBATCH --gres=gpu:1          # 1 gpus per node out of 4
+#SBATCH --mem=48000           # memory per node out of 494000MB
+#SBATCH --job-name=code
+#SBATCH --output=%j.out       # the standard output is written to this file
+#SBATCH --error=%j.err        # the standard error is written to this file
+
+cd /leonardo/home/userexternal/mmock000/NLBSE2025/transformer
+
+echo "Loaded moduleLoaded modules"
+module list
+
+echo $(python <<EOF
+import sys
+if sys.prefix == sys.base_prefix:
+        print("No, you are not in a virtual environment.")
+else:
+        print("Yes, you are in a virtual environment.")
+EOF
+)
+
+source  /leonardo/home/userexternal/mmock000/NLBSE2025/env/bin/activate
+echo $(python <<EOF
+import sys
+if sys.prefix == sys.base_prefix:
+        print("No, you are not in a virtual environment.")
+else:
+        print("Yes, you are in a virtual environment.")
+EOF
+)
+
+nvidia-smi
+
+python main.py ---weighted-loss yes --output-path /leonardo_work/IscrC_AGENT/NLBSE25/results --model "$1" --hs True --old-run "$2"
