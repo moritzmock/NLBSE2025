@@ -94,8 +94,8 @@ def modify_data(data):
     data = data.map(tokenize, batched=True)
     data.set_format(type="torch", columns=["input_ids", "attention_mask", "labels"])
     data = data.remove_columns(['text'])
-    # data = data.map(lambda x: {key: val.to(device) for key, val in x.items()})
-    data = data.map(lambda x: {"labels": x["labels"].float()})
+    data = data.map(lambda x: {key: val.to(device) for key, val in x.items()})
+    # data = data.map(lambda x: {"labels": x["labels"].float()})
 
     return data
 
@@ -199,7 +199,7 @@ def read_args():
     parser.add_argument("--weight-decay", default=0.01)
     parser.add_argument("--lr", default=5e-5)
     parser.add_argument("--eval-strategy", default="no", choices=["no", "epoch"])
-    parser.add_argument("--weighted-loss", default="no", choices=["no", "yes"])
+    parser.add_argument("--weighted-loss", default="yes", choices=["no", "yes"])
 
     return parser.parse_args()
 
