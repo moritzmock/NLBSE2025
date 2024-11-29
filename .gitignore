@@ -1,4 +1,5 @@
 results/*.csv
+result
 data
 env
 dataset

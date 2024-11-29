@@ -8,9 +8,9 @@
 #SBATCH --nodes=1 # use a single cluster node
 #SBATCH --mem=64G
 #SBATCH --time=15-0:00:00
-#SBATCH --gres=gpu:a100_3g.40gb
+#SBATCH --gres=gpu:a100-sxm4-80gb
 #SBATCH --account=ml-vuln
-#SBATCH --partition=gpu-low
+#SBATCH --partition=gpu-pre
 
 cd /home/clusterusers/momock/NLBSE2025/transformer
 module purge
