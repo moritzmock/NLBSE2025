@@ -29,7 +29,7 @@ def compute_metrics(eval_pred):
     # Convert probabilities to binary predictions based on a threshold
     threshold = 0.5
     predictions = (probabilities >= threshold).int()  # Binarize predictions
-
+    print(f"predictions shape: {predictions.shape,predictions}")
     # Ensure predictions and labels are on the same device (CPU)
     predictions = predictions.cpu().numpy()
     labels = labels.cpu().numpy()
@@ -135,14 +135,17 @@ def rename_keys_with_regex(d, old_prefix, new_prefix):
     return new_dict
 
 
-def generate_information(args, jobID):
+def generate_information(args, jobID,lan):
     return f"{jobID}_" \
            f"{args.model}_" \
            f"{args.batch_size}_" \
            f"{args.epochs}_" \
            f"{args.weight_decay}_" \
            f"{args.lr}_" \
-           f"{args.eval_strategy}"
+           f"{args.eval_strategy}_"\
+           f"{args.method_params_lr}_"\
+           f"{args.gamma}_"\
+           f"{lan}"\
 
 
 def extract_weight_method_parameters_from_args(args):

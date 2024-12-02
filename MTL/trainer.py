@@ -3,6 +3,7 @@ import torch, torch.nn as nn
 import numpy as np
 from MTL.utils import compute_metrics
 
+
 class CustomTrainer(Trainer):
             def __init__(self, *args, weight_method, weight_method_name, **kwargs):
                 super().__init__(*args, **kwargs)
@@ -55,6 +56,7 @@ class CustomTrainer(Trainer):
                             logits = model_output.get("logits")  # For ModelOutput, access logits via key
                         else:
                             raise ValueError(f"Unexpected model output format: {type(model_output)}")
+
                     
                     # Collect predictions and labels
                     labels = batch["labels"]
@@ -79,15 +81,25 @@ class CustomTrainer(Trainer):
                 """
                 # Move inputs to device
                 inputs_d = {k: v.to(self.args.device) for k, v in inputs.items()}
+                # labels = inputs.pop("labels")  # Assuming 'labels' is part of the dataset
 
-                losses = self.compute_loss(model,inputs_d) 
+                # # Forward pass
+                # self.optimizer.zero_grad()
+                # model.train()
+                # outputs = model(**inputs)
+                # loss_fct = nn.BCEWithLogitsLoss(reduction='none')
+                
+                # if labels.dtype != torch.float:
+                #    labels=labels.float()
+                
+                losses = self.compute_loss(model,inputs_d) #loss_fct(outputs.get("logits").squeeze(), labels.squeeze()) #
                 
                 if losses.dim() > 1:  # Check if batch dim s greater than 1
                     per_sample_loss = losses.mean(dim=0)  # Compute mean across heads for each sample
                 else:
                     per_sample_loss = losses
                 # Apply custom backward method with weighted losses
-                total_loss, extra_outputs = self.weight_method.backward(
+                loss, extra_outputs = self.weight_method.backward(
                     losses=per_sample_loss
                 )
                 
@@ -103,7 +115,10 @@ class CustomTrainer(Trainer):
 
                 if "famo" in self.weight_method_name:
                     with torch.no_grad():
-                        new_losses = self.compute_loss(model,inputs)
+                        # Forward pass again for updated losses
+                        # self.compute_loss(model,labels,inputs)
+                        # train_pred = model(**inputs)
+                        new_losses = self.compute_loss(model,inputs)#loss_fct(train_pred.get("logits").squeeze(), labels.squeeze())
                         if losses.dim() > 1:  # Check if batch dim s greater than 1
                             per_sample_new_losses = new_losses.mean(dim=0)  # Compute mean across heads for each sample
                         else:
@@ -111,4 +126,4 @@ class CustomTrainer(Trainer):
                         
                         self.weight_method.method.update(per_sample_new_losses.detach())
 
-                return total_loss
+                return per_sample_loss.sum()

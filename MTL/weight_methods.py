@@ -138,7 +138,7 @@ class FAMO(WeightMethod):
         n_tasks: int,
         device: torch.device,
         gamma: float = 1e-3, 
-        w_lr: float = 0.025,
+        w_lr: float = 0.0025,
         task_weights: Union[List[float], torch.Tensor] = None,
         max_norm: float = 1.0,
     ):
@@ -156,7 +156,7 @@ class FAMO(WeightMethod):
         z = F.softmax(self.w, -1)
         D = losses - self.min_losses + 1e-8
         c = (z / D).sum().detach()
-        loss = abs(D.log() * z / c).sum()
+        loss = (D.log() * z / c).sum()
         return loss, {"weights": z, "logits": self.w.detach().clone()}
 
     def update(self, curr_loss):
@@ -171,7 +171,55 @@ class FAMO(WeightMethod):
         self.w.grad = d
         self.w_opt.step()
 
+class DynamicWeightAverage(WeightMethod):
+    """Dynamic Weight Average from `End-to-End Multi-Task Learning with Attention`.
+    Modification of: https://github.com/lorenmt/mtan/blob/master/im2im_pred/model_segnet_split.py#L242
+    """
 
+    def __init__(
+        self, n_tasks, device: torch.device, iteration_window: int = 25, temp=2.0
+    ):
+        """
+
+        Parameters
+        ----------
+        n_tasks :
+        iteration_window : 'iteration' loss is averaged over the last 'iteration_window' losses
+        temp :
+        """
+        super().__init__(n_tasks, device=device)
+        self.iteration_window = iteration_window
+        self.temp = temp
+        self.running_iterations = 0
+        self.costs = np.ones((iteration_window * 2, n_tasks), dtype=np.float32)
+        self.weights = np.ones(n_tasks, dtype=np.float32)
+
+    def get_weighted_loss(self, losses, **kwargs):
+
+        cost = losses.detach().cpu().numpy()
+
+        # update costs - fifo
+        self.costs[:-1, :] = self.costs[1:, :]
+        self.costs[-1, :] = cost
+
+        if self.running_iterations > self.iteration_window:
+            ws = self.costs[self.iteration_window :, :].mean(0) / self.costs[
+                : self.iteration_window, :
+            ].mean(0)
+            self.weights = (self.n_tasks * np.exp(ws / self.temp)) / (
+                np.exp(ws / self.temp)
+            ).sum()
+
+        task_weights = torch.from_numpy(self.weights.astype(np.float32)).to(
+            losses.device
+        )
+        loss = (task_weights * losses).mean()
+
+        self.running_iterations += 1
+
+        return loss, dict(weights=task_weights)
+
+    
 class WeightMethods:
     def __init__(self, method: str, n_tasks: int, device: torch.device, **kwargs):
         """
@@ -200,4 +248,5 @@ class WeightMethods:
 METHODS = dict(
     ls = LinearScalarization,
     famo = FAMO,
+    dwa=DynamicWeightAverage
 )

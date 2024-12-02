@@ -56,7 +56,7 @@ def read_args():
     parser.add_argument("--weight-decay", default=0.01)
     parser.add_argument("--lr", default=5e-5)
     parser.add_argument("--eval-strategy", default="no", choices=["no", "epoch"])
-    parser.add_argument("--weight-method-name", default="famo", choices=["ls", "wls","famo"])
+    parser.add_argument("--weight-method-name", default="famo", choices=["ls", "wls","famo",'dwa'])
     parser.add_argument("--gamma", type=float, default=0.01, help="gamma of famo")
     parser.add_argument("--method-params-lr", type=float, default=0.025, help="lr for adma of famo")
     parser.add_argument("--max-norm", type=float, default=1.0, help="beta for RMS_weight alg.")
@@ -172,12 +172,13 @@ def train_models(args, ds, job_id, device):
         for i, key in enumerate(labels[lan]):
             result = rename_keys_with_regex(result, "eval_" + lan + "_class_" + str(i), "eval_" + lan + "_class_" + key)
 
-        path = os.path.join(args.output_path, f"all_results_{job_id}.csv")
+        # path = os.path.join(args.output_path, f"all_results_{job_id}.csv")
+        path = os.path.join(args.output_path, f"{job_id}/{lan}/all_results.csv")
         csv_data = pd.read_csv(path) if os.path.exists(path) else pd.DataFrame()
 
         index = len(csv_data) if langs.index(lan) == 0 else len(csv_data) - 1
 
-        csv_data.loc[index, "info"] = generate_information(args, job_id)
+        csv_data.loc[index, "info"] = generate_information(args, job_id,lan)
 
         for key in result.keys():
             print(f"{key}: {result[key]}")
@@ -235,12 +236,13 @@ if __name__ == "__main__":
 
     if args.hs == True:
         epochs = [1, 3, 5, 10]
-        lr = [ 3e-5, 4e-5, 5e-5] #1e-5, 2e-5,
+        lr = [3e-5,4e-5, 5e-5] 
         eval_strategy = ["no"]
-        batch_size = [32,16,8,4,2,1]
+        batch_size = [16,8,4,2,1]
         weight_decay = [0, 0.01, 0.001]
+        method_params_lr = [2e-25, 3e-25, 4e-25]
         gamma = [0.01,0.001,0.0001]
-        arrays = [epochs, lr, eval_strategy, batch_size, weight_decay,gamma]
+        arrays = [epochs, lr, eval_strategy, batch_size, weight_decay,gamma,method_params_lr]
         combinations = generate_combinations(*arrays)
 
         path = os.path.join(args.output_path, args.old_run) if args.old_run != "False" else None
@@ -277,6 +279,8 @@ if __name__ == "__main__":
             args.eval_strategy = combination[2]  # overwrites the parameter
             args.batch_size = combination[3]     # overwrites the parameter
             args.weight_decay = combination[4]   # overwrites the parameter
+            args.method_params_lr = combination[5]   # overwrites the parameter
+            args.gamma = combination[6]   # overwrites the parameter
 
             print(f"Execution number {index+1} out of {len(combinations)}")
 
