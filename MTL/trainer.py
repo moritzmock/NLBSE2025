@@ -1,7 +1,7 @@
 from transformers import Trainer
 import torch, torch.nn as nn
 import numpy as np
-from MTL.utils import compute_metrics
+from utils import compute_metrics
 
 
 class CustomTrainer(Trainer):

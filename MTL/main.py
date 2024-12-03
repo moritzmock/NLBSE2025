@@ -12,7 +12,7 @@ from itertools import product
 import numpy as np
 import torch, torch.nn as nn
 
-from MTL.utils import (
+from utils import (
     create_path_structure,
     rename_keys_with_regex,
     generate_information,
@@ -21,9 +21,9 @@ from MTL.utils import (
     generate_combinations,
     extract_weight_method_parameters_from_args,
     set_seed)
-from MTL.weight_methods import WeightMethods
-from MTL.model import RobertaForSequenceMultiLabelClassification
-from MTL.trainer import CustomTrainer
+from weight_methods import WeightMethods
+from model import RobertaForSequenceMultiLabelClassification
+from trainer import CustomTrainer
 
 
 def tokenize(batch):
