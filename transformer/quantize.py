@@ -123,6 +123,8 @@ if __name__ == "__main__":
 
     print(test_data)
 
+    print(labels[lan])
+
     num_classes = len(labels[lan])
     class_metrics = {}
 
