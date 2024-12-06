@@ -6,6 +6,7 @@ import torch
 import os
 from datasets import load_dataset, Dataset
 from main import read_args, langs, labels as labels_langs
+import re
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "mps")
 
@@ -153,4 +154,8 @@ if __name__ == "__main__":
 
     for key in class_metrics.keys():
         print(key, class_metrics[key])
+
+    print(os.path.join(re.subs("result", "q_result", args.input_path))
+
+    model.save_pretrained(os.path.join(re.subs("result", "q_result", args.input_path), lan, "models"))
 
