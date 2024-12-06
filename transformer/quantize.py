@@ -123,6 +123,8 @@ if __name__ == "__main__":
 
     print(test_data)
 
+    print(langs)
+    print(lan)
     print(langs[lan])
 
     num_classes = len(langs[lan])
