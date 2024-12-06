@@ -1,11 +1,12 @@
 from main import read_args
-from transformers import AutoModelForSequenceClassification
-from huggingface_hub import HfApi, Repository
+from huggingface_hub import Repository
+import logging
+
 
 if __name__ == "__main__":
     args = read_args()
 
-    model = AutoModelForSequenceClassification.from_pretrained(args.input_path)
+    logging.basicConfig(level=logging.DEBUG)
 
     model_name = "mmock/test"
 
