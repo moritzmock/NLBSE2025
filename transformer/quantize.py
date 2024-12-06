@@ -123,9 +123,9 @@ if __name__ == "__main__":
 
     print(test_data)
 
-    print(labels[lan])
+    print(langs[lan])
 
-    num_classes = len(labels[lan])
+    num_classes = len(langs[lan])
     class_metrics = {}
 
     for class_idx in range(num_classes):
