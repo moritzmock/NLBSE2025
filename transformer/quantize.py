@@ -5,7 +5,7 @@ import random
 import torch
 import os
 from datasets import load_dataset, Dataset
-from main import read_args, langs
+from main import read_args, langs, labels
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "mps")
 
@@ -127,8 +127,8 @@ if __name__ == "__main__":
     test = ds[f"{lan}_test"]
 
     #model = RobertaForSequenceClassification.from_pretrained(os.path.join(args.input_path, lan, "models"), quantization_config=nf4_config)
-    model = RobertaForSequenceClassification.from_pretrained(args.model, quantization_config=nf4_config)
-
+    model = RobertaForSequenceClassification.from_pretrained(args.model, quantization_config=nf4_config, num_labels=len(labels[lan]))
+    model.eval()
     print("model loaded...")
 
     print(test)
@@ -139,4 +139,28 @@ if __name__ == "__main__":
 
     print(test_data)
     print(test_data.keys())
+
+    input_ids = torch.tensor(test_data["input_ids"].tolist()).to(device)
+    attention_mask = torch.tensor(test_data["attention_mask"].tolist()).to(device)
+
+    with torch.no_grad():
+        # Forward pass
+        outputs = model(input_ids=input_ids, attention_mask=attention_mask)
+
+    # Extract logits (raw outputs)
+    logits = outputs.logits
+
+    # Apply sigmoid activation to get probabilities
+    probs = torch.sigmoid(logits)
+
+    # Convert probabilities to binary predictions (threshold = 0.5)
+    threshold = 0.5
+    predictions = (probs > threshold).int().cpu().numpy()
+
+    print("Predictions:")
+    print(predictions)
+
+    test_data["predictions"] = predictions.tolist()
+
+    print(test_data)
 
