@@ -140,10 +140,12 @@ if __name__ == "__main__":
     print(test_data)
     print(test_data.keys())
 
+
+    print(len(test_data["input_ids"][0]))
+
     input_ids = torch.tensor(test_data["input_ids"].tolist()).to(device)
     attention_mask = torch.tensor(test_data["attention_mask"].tolist()).to(device)
 
-    print(len(input_ids))
 
     with torch.no_grad():
         # Forward pass
