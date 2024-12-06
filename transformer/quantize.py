@@ -132,3 +132,7 @@ if __name__ == "__main__":
 
     print(test)
 
+    test_data = modify_data(test)
+
+    print(test_data)
+
