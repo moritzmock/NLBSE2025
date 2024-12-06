@@ -122,3 +122,28 @@ if __name__ == "__main__":
 
     print(test_data)
 
+    num_classes = len(labels[lan])
+    class_metrics = {}
+
+    for class_idx in range(num_classes):
+        tp = np.sum((predictions[:, class_idx] == 1) & (labels[:, class_idx] == 1))
+        fp = np.sum((predictions[:, class_idx] == 1) & (labels[:, class_idx] == 0))
+        tn = np.sum((predictions[:, class_idx] == 0) & (labels[:, class_idx] == 0))
+        fn = np.sum((predictions[:, class_idx] == 0) & (labels[:, class_idx] == 1))
+
+        # Calculate precision, recall, and F1 score for the current class
+        precision = tp / (tp + fp) if (tp + fp) > 0 else 0
+        recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+        f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+
+        # Store metrics for the current class
+        class_metrics[f"class_{labels[lan][class_idx]}_true_positives"] = tp
+        class_metrics[f"class_{labels[lan][class_idx]}_false_positives"] = fp
+        class_metrics[f"class_{labels[lan][class_idx]}_true_negatives"] = tn
+        class_metrics[f"class_{labels[lan][class_idx]}_false_negatives"] = fn
+        class_metrics[f"class_{labels[lan][class_idx]}_precision"] = precision
+        class_metrics[f"class_{labels[lan][class_idx]}_recall"] = recall
+        class_metrics[f"class_{labels[lan][class_idx]}_f1"] = f1
+
+    print(class_metrics)
+
