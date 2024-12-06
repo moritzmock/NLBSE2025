@@ -143,6 +143,8 @@ if __name__ == "__main__":
     input_ids = torch.tensor(test_data["input_ids"].tolist()).to(device)
     attention_mask = torch.tensor(test_data["attention_mask"].tolist()).to(device)
 
+    print(len(input_ids))
+
     with torch.no_grad():
         # Forward pass
         outputs = model(input_ids=input_ids, attention_mask=attention_mask)
