@@ -45,5 +45,5 @@ if __name__ == "__main__":
         bnb_4bit_compute_dtype=torch.bfloat16
     )
 
-    model = RobertaForSequenceClassification.from_pretrained(args.input_path, load_in_4bit=True, device_map="auto")
+    model = RobertaForSequenceClassification.from_pretrained(args.input_path, quantization_config=nf4_config)
 
