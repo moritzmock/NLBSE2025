@@ -6,7 +6,7 @@ import torch
 import os
 from datasets import load_dataset, Dataset
 import pandas as pd
-from main import generate_weights, WeightedBCELoss, read_args, modify_data, rename_keys_with_regex, labels, langs, generate_information
+from main import generate_weights, WeightedBCELoss, read_args, rename_keys_with_regex, labels, langs, generate_information
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -26,6 +26,21 @@ else:
 
 # Check the current device
 print(f"Current device: {torch.cuda.current_device()}")
+
+
+def tokenize(batch):
+    return tokenizer(batch["text"], padding=True, truncation=True, max_length=512)
+
+
+def modify_data(data):
+    data = Dataset.from_dict({"text": data["combo"], "labels": data["labels"]})
+    data = data.map(tokenize, batched=True)
+    data.set_format(type="torch", columns=["input_ids", "attention_mask", "labels"])
+    data = data.remove_columns(['text'])
+    data = data.map(lambda x: {key: val.to(device) for key, val in x.items()})
+    # data = data.map(lambda x: {"labels": x["labels"].float()})
+
+    return data
 
 def set_seed(seed):
     """for reproducibility
