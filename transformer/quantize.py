@@ -1,12 +1,11 @@
-from transformers import RobertaForSequenceClassification, TrainingArguments, Trainer, RobertaTokenizer, DataCollatorWithPadding
+from transformers import RobertaForSequenceClassification, RobertaTokenizer
 from transformers import BitsAndBytesConfig
 import numpy as np
 import random
 import torch
 import os
 from datasets import load_dataset, Dataset
-import pandas as pd
-from main import generate_weights, WeightedBCELoss, read_args, rename_keys_with_regex, labels, langs, generate_information
+from main import read_args, langs
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -125,81 +124,11 @@ if __name__ == "__main__":
     tokenizer = RobertaTokenizer.from_pretrained(args.model)
     ds = load_dataset('NLBSE/nlbse25-code-comment-classification')
 
-    train = ds[f"{lan}_train"]
     test = ds[f"{lan}_test"]
 
     model = RobertaForSequenceClassification.from_pretrained(os.path.join(args.input_path, lan, "models"), quantization_config=nf4_config)
 
     print("model loaded...")
 
-    label_weights = torch.tensor(generate_weights(args.weighted_loss, train))
-
-    custom_loss = WeightedBCELoss(weights=label_weights)
-
-
-    class CustomTrainer(Trainer):
-        def compute_loss(self, model, inputs, return_outputs=False):
-            labels = inputs.pop("labels").float().to(device)  # Move labels to the global device
-            inputs = {key: val.to(device) for key, val in inputs.items()}  # Move inputs to global device
-
-            # labels = inputs.pop("labels").float()
-            outputs = model(**inputs)
-            logits = outputs.logits
-            loss = custom_loss(logits, labels)
-            return (loss, outputs) if return_outputs else loss
-
-    data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
-
-    job_id = args.input_path.split("/")[-1]
-
-    training_args = TrainingArguments(
-        output_dir=f"{args.output_path}/{job_id}/{lan}/q_results",
-        eval_strategy=args.eval_strategy,
-        per_device_train_batch_size=args.batch_size,
-        per_device_eval_batch_size=args.batch_size,
-        num_train_epochs=args.epochs,
-        weight_decay=args.weight_decay,
-        learning_rate=args.lr,
-        logging_dir=f"{args.output_path}/{job_id}/{lan}/q_logs"
-    )
-
-    train_data_complete = modify_data(train)
-    test_data = modify_data(test)
-    train_data = train_data_complete.train_test_split(test_size=len(test_data) / len(train_data_complete), seed=42)[
-        "train"] if args.eval_strategy != "no" else train_data_complete
-    val_data = train_data_complete.train_test_split(test_size=len(test_data) / len(train_data_complete), seed=42)[
-        "test"] if args.eval_strategy != "no" else None
-
-    trainer = CustomTrainer(
-        model=model,
-        args=training_args,
-        train_dataset=train_data,
-        eval_dataset=val_data,
-        compute_metrics=compute_metrics,
-        data_collator=data_collator
-    )
-
-    trainer.save_model(f"{args.output_path}/{job_id}/{lan}/q_models")
-
-    result = trainer.evaluate(eval_dataset=test_data)
-
-    result = rename_keys_with_regex(result, "eval_", "eval_" + lan + "_")
-    result = rename_keys_with_regex(result, "epoch", "epoch_" + lan)
-    for i, key in enumerate(labels[lan]):
-        result = rename_keys_with_regex(result, "eval_" + lan + "_class_" + str(i), "eval_" + lan + "_class_" + key)
-
-    path = os.path.join(args.output_path, f"all_results_{job_id}_q.csv")
-    csv_data = pd.read_csv(path) if os.path.exists(path) else pd.DataFrame()
-
-    index = len(csv_data) if langs.index(lan) == 0 else len(csv_data) - 1
-
-    csv_data.loc[index, "info"] = generate_information(args, job_id)
-
-    for key in result.keys():
-        print(f"{key}: {result[key]}")
-        csv_data.loc[index, key] = result[key]
-
-    csv_data.to_csv(path, index=False)
-
-    print("---------------------")
+    print(test)
 
