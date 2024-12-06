@@ -107,15 +107,15 @@ if __name__ == "__main__":
 
     lan = langs[0]
 
-    tokenizer = RobertaTokenizer.from_pretrained(os.path.join(args.input_path, lan, "models"))
+    tokenizer = RobertaTokenizer.from_pretrained(args.model)
     ds = load_dataset('NLBSE/nlbse25-code-comment-classification')
 
     train = ds[f"{lan}_train"]
     test = ds[f"{lan}_test"]
 
-    model = RobertaForSequenceClassification.from_pretrained(args.input_path, quantization_config=nf4_config)
+    model = RobertaForSequenceClassification.from_pretrained(os.path.join(args.input_path, lan, "models"), quantization_config=nf4_config)
 
-    print("models loaded...")
+    print("model loaded...")
 
     label_weights = torch.tensor(generate_weights(args.weighted_loss, train))
 
