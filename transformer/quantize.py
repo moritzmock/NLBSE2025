@@ -5,7 +5,7 @@ import random
 import torch
 import os
 from datasets import load_dataset, Dataset
-from main import read_args, langs, labels
+from main import read_args, langs, labels as labels_langs
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "mps")
 
@@ -123,11 +123,11 @@ if __name__ == "__main__":
 
     print(test_data)
 
-    print(langs)
+    print(labels_langs)
     print(lan)
-    print(langs[lan])
+    print(labels_langs[lan])
 
-    num_classes = len(langs[lan])
+    num_classes = len(labels_langs[lan])
     class_metrics = {}
 
     for class_idx in range(num_classes):
