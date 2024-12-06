@@ -155,7 +155,6 @@ if __name__ == "__main__":
     for key in class_metrics.keys():
         print(key, class_metrics[key])
 
-    print(os.path.join(re.sub("result", "q_result", args.input_path)))
 
-    model.save_pretrained(os.path.join(re.sub("result", "q_result", args.input_path), lan, "models"))
+    model.save_pretrained(os.path.join(args.input_path, "q_"+lan, "models"))
 
