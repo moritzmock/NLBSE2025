@@ -99,6 +99,7 @@ if __name__ == "__main__":
 
     input_ids = torch.tensor(test_data["input_ids"].tolist()).to(device)
     attention_mask = torch.tensor(test_data["attention_mask"].tolist()).to(device)
+    labels = torch.tensor(test_data["labels"].tolist()).to(device)
 
 
     with torch.no_grad():
