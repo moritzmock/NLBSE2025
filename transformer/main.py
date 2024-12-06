@@ -29,7 +29,7 @@ else:
     print(f"Number of GPUs available: {num_gpus}")
 
 # Check the current device
-print(f"Current device: {torch.cuda.current_device()}")
+#print(f"Current device: {torch.cuda.current_device()}")
 
 
 def generate_combinations(*arrays):

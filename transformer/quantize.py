@@ -7,7 +7,7 @@ import os
 from datasets import load_dataset, Dataset
 from main import read_args, langs
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:0" if torch.cuda.is_available() else "mps")
 
 # Check the number of available GPUs
 num_gpus = torch.cuda.device_count()
@@ -24,7 +24,7 @@ else:
     print(f"Number of GPUs available: {num_gpus}")
 
 # Check the current device
-print(f"Current device: {torch.cuda.current_device()}")
+#print(f"Current device: {torch.cuda.current_device()}")
 
 
 def tokenize(batch):
@@ -126,7 +126,8 @@ if __name__ == "__main__":
 
     test = ds[f"{lan}_test"]
 
-    model = RobertaForSequenceClassification.from_pretrained(os.path.join(args.input_path, lan, "models"), quantization_config=nf4_config)
+    #model = RobertaForSequenceClassification.from_pretrained(os.path.join(args.input_path, lan, "models"), quantization_config=nf4_config)
+    model = RobertaForSequenceClassification.from_pretrained(args.model, quantization_config=nf4_config)
 
     print("model loaded...")
 
@@ -137,4 +138,5 @@ if __name__ == "__main__":
     test_data = test_data.to_pandas()
 
     print(test_data)
+    print(test_data.keys())
 
