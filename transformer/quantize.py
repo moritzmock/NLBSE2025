@@ -24,7 +24,7 @@ else:
     print(f"Number of GPUs available: {num_gpus}")
 
 # Check the current device
-#print(f"Current device: {torch.cuda.current_device()}")
+print(f"Current device: {torch.cuda.current_device()}")
 
 
 def tokenize(batch):
@@ -58,54 +58,6 @@ def set_seed(seed):
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
 
-def compute_metrics(eval_pred):
-    # Unpack the predictions and labels
-    logits, labels = eval_pred
-
-    # Convert logits to a PyTorch tensor if they are in NumPy format
-    if isinstance(logits, np.ndarray):
-        logits = torch.from_numpy(logits)
-    if isinstance(labels, np.ndarray):
-        labels = torch.from_numpy(labels)
-
-    # Apply sigmoid to logits to get probabilities (for multilabel)
-    probabilities = torch.sigmoid(logits)  # Shape: (num_samples, num_classes)
-
-    # Convert probabilities to binary predictions based on a threshold
-    threshold = 0.5
-    predictions = (probabilities >= threshold).int()  # Binarize predictions
-
-    # Ensure predictions and labels are on the same device (CPU)
-    predictions = predictions.cpu().numpy()
-    labels = labels.cpu().numpy()
-
-    # Check if predictions and labels are compatible
-    num_classes = labels.shape[1]
-    class_metrics = {}
-
-    # Calculate TP, FP, TN, FN per class
-    for class_idx in range(num_classes):
-        tp = np.sum((predictions[:, class_idx] == 1) & (labels[:, class_idx] == 1))
-        fp = np.sum((predictions[:, class_idx] == 1) & (labels[:, class_idx] == 0))
-        tn = np.sum((predictions[:, class_idx] == 0) & (labels[:, class_idx] == 0))
-        fn = np.sum((predictions[:, class_idx] == 0) & (labels[:, class_idx] == 1))
-
-        # Calculate precision, recall, and F1 score for the current class
-        precision = tp / (tp + fp) if (tp + fp) > 0 else 0
-        recall = tp / (tp + fn) if (tp + fn) > 0 else 0
-        f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
-
-        # Store metrics for the current class
-        class_metrics[f"class_{class_idx}_true_positives"] = tp
-        class_metrics[f"class_{class_idx}_false_positives"] = fp
-        class_metrics[f"class_{class_idx}_true_negatives"] = tn
-        class_metrics[f"class_{class_idx}_false_negatives"] = fn
-        class_metrics[f"class_{class_idx}_precision"] = precision
-        class_metrics[f"class_{class_idx}_recall"] = recall
-        class_metrics[f"class_{class_idx}_f1"] = f1
-
-    return class_metrics
-
 
 if __name__ == "__main__":
     set_seed(42)
@@ -126,8 +78,7 @@ if __name__ == "__main__":
 
     test = ds[f"{lan}_test"]
 
-    #model = RobertaForSequenceClassification.from_pretrained(os.path.join(args.input_path, lan, "models"), quantization_config=nf4_config)
-    model = RobertaForSequenceClassification.from_pretrained(args.model, quantization_config=nf4_config, num_labels=len(labels[lan]))
+    model = RobertaForSequenceClassification.from_pretrained(os.path.join(args.input_path, lan, "models"), quantization_config=nf4_config)
     model.eval()
     print("model loaded...")
 
@@ -142,6 +93,9 @@ if __name__ == "__main__":
 
 
     print(len(test_data["input_ids"][0]))
+
+    for idx, input_id in enumerate(test_data["input_ids"]):
+        print(f"Length of sequence {idx}: {len(input_id)}")
 
     input_ids = torch.tensor(test_data["input_ids"].tolist()).to(device)
     attention_mask = torch.tensor(test_data["attention_mask"].tolist()).to(device)
