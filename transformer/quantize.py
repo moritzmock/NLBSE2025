@@ -115,6 +115,7 @@ if __name__ == "__main__":
     # Convert probabilities to binary predictions (threshold = 0.5)
     threshold = 0.5
     predictions = (probs > threshold).int().cpu().numpy()
+    labels = labels.cpu().numpy()
 
     print("Predictions:")
     print(predictions)
