@@ -44,4 +44,4 @@ EOF
 
 nvidia-smi
 
-python quantize.py --input-path /home/clusterusers/momock/NLBSE2025/result/23454/java
+python quantize.py --input-path /home/clusterusers/momock/NLBSE2025/result/23454

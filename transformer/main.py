@@ -185,7 +185,8 @@ def generate_information(args, jobID):
 def read_args():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--output-path", required=True)
+    parser.add_argument("--output-path")
+    parser.add_argument("--input-path")
     parser.add_argument("--clear-output-path", default=True, type=str2bool)
     parser.add_argument("--hs", default=True, type=str2bool, help="If true, the hyperparameters are overwritten")
     parser.add_argument("--old-run", default="False", type=str,
@@ -348,19 +349,20 @@ def set_seed(seed):
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
 
+langs = ['java', 'python', 'pharo']
+labels = {
+    'java': ['summary', 'Ownership', 'Expand', 'usage', 'Pointer', 'deprecation', 'rational'],
+    'python': ['Usage', 'Parameters', 'DevelopmentNotes', 'Expand', 'Summary'],
+    'pharo': ['Keyimplementationpoints', 'Example', 'Responsibilities', 'Classreferences', 'Intent', 'Keymessages',
+              'Collaborators']
+}
 
 if __name__ == "__main__":
     set_seed(42)
     args = read_args()
     print(args)
 
-    langs = ['java', 'python', 'pharo']
-    labels = {
-        'java': ['summary', 'Ownership', 'Expand', 'usage', 'Pointer', 'deprecation', 'rational'],
-        'python': ['Usage', 'Parameters', 'DevelopmentNotes', 'Expand', 'Summary'],
-        'pharo': ['Keyimplementationpoints', 'Example', 'Responsibilities', 'Classreferences', 'Intent', 'Keymessages',
-                  'Collaborators']
-    }
+
 
     ds = load_dataset('NLBSE/nlbse25-code-comment-classification')
     print("Dataset was loaded successfully!")
