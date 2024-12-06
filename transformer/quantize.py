@@ -28,7 +28,7 @@ else:
 
 
 def tokenize(batch):
-    return tokenizer(batch["text"], padding=True, truncation=True, max_length=512)
+    return tokenizer(batch["text"], padding=True, truncation=True, max_length=512, return_tensors="pt")
 
 
 def modify_data(data):
