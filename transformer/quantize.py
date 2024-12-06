@@ -151,5 +151,6 @@ if __name__ == "__main__":
         class_metrics[f"class_{labels_langs[lan][class_idx]}_recall"] = recall
         class_metrics[f"class_{labels_langs[lan][class_idx]}_f1"] = f1
 
-    print(class_metrics)
+    for key in class_metrics.keys():
+        print(key, class_metrics[key])
 
