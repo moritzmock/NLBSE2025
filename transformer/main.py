@@ -228,15 +228,13 @@ def generate_weights(weighted_loss, data):
         class_counts = labels_array.sum(axis=0)
         total_samples = len(labels)
         class_frequencies = (class_counts/total_samples)*100
-        print(class_frequencies)
+
         sorted_values = sorted(range(len(class_frequencies)), key=lambda x: class_frequencies[x], reverse=True)
         sorted_frequencies = sorted(class_frequencies)
 
         mapped_output = [0] * len(class_frequencies)
         for i, idx in enumerate(sorted_values):
             mapped_output[idx] = sorted_frequencies[i]
-
-        print(mapped_output)
 
         return mapped_output
 
@@ -259,7 +257,6 @@ def train_models(args, ds, job_id):
         test = ds[f"{lan}_test"]
 
         label_weights = torch.tensor(generate_weights(args.weighted_loss, train))
-        quit()
 
         custom_loss = WeightedBCELoss(weights=label_weights)
 
