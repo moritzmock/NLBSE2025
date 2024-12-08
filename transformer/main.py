@@ -259,6 +259,7 @@ def train_models(args, ds, job_id):
         test = ds[f"{lan}_test"]
 
         label_weights = torch.tensor(generate_weights(args.weighted_loss, train))
+        quit()
 
         custom_loss = WeightedBCELoss(weights=label_weights)
 
