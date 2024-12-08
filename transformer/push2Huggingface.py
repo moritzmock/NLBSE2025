@@ -1,5 +1,5 @@
 from main import read_args
-from huggingface_hub import Repository
+from transformers import PushToHubCallback
 import logging
 
 
@@ -14,3 +14,4 @@ if __name__ == "__main__":
 
     repo.push_to_hub()
 
+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

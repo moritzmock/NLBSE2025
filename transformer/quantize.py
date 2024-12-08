@@ -1,12 +1,10 @@
-from transformers import RobertaForSequenceClassification, RobertaTokenizer
-from transformers import BitsAndBytesConfig
+from transformers import RobertaForSequenceClassification, RobertaTokenizer, BitsAndBytesConfig
 import numpy as np
 import random
 import torch
 import os
 from datasets import load_dataset, Dataset
 from main import read_args, langs, labels as labels_langs
-import re
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "mps")
 
@@ -38,7 +36,6 @@ def modify_data(data):
     data.set_format(type="torch", columns=["input_ids", "attention_mask", "labels"])
     data = data.remove_columns(['text'])
     data = data.map(lambda x: {key: val.to(device) for key, val in x.items()})
-    # data = data.map(lambda x: {"labels": x["labels"].float()})
 
     return data
 

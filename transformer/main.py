@@ -200,7 +200,7 @@ def read_args():
     parser.add_argument("--weight-decay", default=0.01)
     parser.add_argument("--lr", default=5e-5)
     parser.add_argument("--eval-strategy", default="no", choices=["no", "epoch"])
-    parser.add_argument("--weighted-loss", default="yes", choices=["no", "yes"])
+    parser.add_argument("--weighted-loss", default="ranked", choices=["no", "yes", "ranked"])
 
     return parser.parse_args()
 
@@ -221,6 +221,24 @@ def generate_weights(weighted_loss, data):
         result = np.array(result)
 
         return result * (1 / np.sum(result))
+
+    if weighted_loss == "ranked":
+        labels = data["labels"]
+        labels_array = np.array(labels)
+        class_counts = labels_array.sum(axis=0)
+        total_samples = len(labels)
+        class_frequencies = (class_counts/total_samples)*100
+        print(class_frequencies)
+        sorted_values = sorted(range(len(class_frequencies)), key=lambda x: class_frequencies[x], reverse=True)
+        sorted_frequencies = sorted(class_frequencies)
+
+        mapped_output = [0] * len(class_frequencies)
+        for i, idx in enumerate(sorted_values):
+            mapped_output[idx] = sorted_frequencies[i]
+
+        print(mapped_output)
+
+        return mapped_output
 
 
     # NO WEIGHTED LOSS

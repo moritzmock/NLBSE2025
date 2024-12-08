@@ -1,8 +1,11 @@
+*/java/
+*/q_java/
 output
 result
 data
 env
 dataset
+.idea/*
 
 *.err
 *.out
