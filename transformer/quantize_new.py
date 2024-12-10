@@ -45,7 +45,7 @@ if __name__ == "__main__":
     print(args)
 
     lan = "java"
-    onnx_model = ORTModelForSequenceClassification.from_pretrained(os.path.join(args.input_path, lan, "models"), export=True, library="transformers")
+    onnx_model = ORTModelForSequenceClassification.from_pretrained(os.path.join(args.input_path, lan, "models"), export=True)
     tokenizer = AutoTokenizer.from_pretrained("roberta-base")
     quantizer = ORTQuantizer.from_pretrained(onnx_model)
     qconfig = AutoQuantizationConfig.arm64(is_static=True, per_channel=False)
