@@ -32,7 +32,7 @@ else:
 EOF
 )
 
-source  /data/users/momock/NLBSE25/env/bin/activate
+source  /data/users/momock/NLBSE25/env_q/bin/activate
 echo $(python <<EOF
 import sys
 if sys.prefix == sys.base_prefix:
@@ -44,4 +44,4 @@ EOF
 
 nvidia-smi
 
-python quantize.py --input-path /home/clusterusers/momock/NLBSE2025/result/23454 --output-path /data/users/momock/NLBSE25/results
+python quantize.py --input-path /home/clusterusers/momock/NLBSE2025/result/23577 --output-path /data/users/momock/NLBSE25/results

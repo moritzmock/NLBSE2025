@@ -4,6 +4,7 @@ output
 result
 data
 env
+env_q
 dataset
 .idea/*
 

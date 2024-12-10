@@ -71,19 +71,18 @@ if __name__ == "__main__":
     )
     '''
 
-
+    '''
     nf4_config = BitsAndBytesConfig(
         load_in_4bit=True,
         bnb_4bit_quant_type="nf4",
         bnb_4bit_use_double_quant=False,
         bnb_4bit_compute_dtype=torch.bfloat16
     )
-
     '''
+
     nf4_config = BitsAndBytesConfig(
         load_in_8bit=True
     )
-    '''
 
     lan = langs[0]
 
@@ -169,5 +168,5 @@ if __name__ == "__main__":
         print(key, class_metrics[key])
 
 
-    model.save_pretrained(os.path.join(args.input_path, "q_"+lan, "models"))
+    model.save_pretrained(os.path.join(args.input_path, "q_2_"+lan, "models"))
 
