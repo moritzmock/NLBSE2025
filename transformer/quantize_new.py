@@ -41,6 +41,9 @@ def preprocess_fn(ex, tokenizer):
 if __name__ == "__main__":
 
     args = read_args()
+
+    print(args)
+
     lan = "java"
     onnx_model = ORTModelForSequenceClassification.from_pretrained(args.input_path, export=True, library="transformers")
     tokenizer = AutoTokenizer.from_pretrained("roberta-base")
