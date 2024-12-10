@@ -52,17 +52,14 @@ if __name__ == "__main__":
 
     ds = load_dataset('NLBSE/nlbse25-code-comment-classification')
 
-    print(ds)
-
-    quit()
-
+    print(lan+"_train")
 
     # Load the training dataset
     calibration_dataset = quantizer.get_calibration_dataset(
         'NLBSE/nlbse25-code-comment-classification',
         preprocess_function=partial(preprocess_fn, tokenizer=tokenizer),
         num_samples=200,
-        dataset_split="java_train",
+        dataset_split=lan+"_train",
     )
 
     calibration_config = AutoCalibrationConfig.minmax(calibration_dataset)
