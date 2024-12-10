@@ -91,7 +91,11 @@ if __name__ == "__main__":
 
     test = ds[f"{lan}_test"]
 
-    model = RobertaForSequenceClassification.from_pretrained(os.path.join(args.input_path, lan, "models"), quantization_config=nf4_config)
+    nf4_config = BitsAndBytesConfig(
+        load_in_8bit=True
+    )
+
+    model = RobertaForSequenceClassification.from_pretrained(os.path.join(args.input_path, lan, "models"), load_in_8bit=True, device_map="auto")
     model.eval()
     print("model loaded...")
 
