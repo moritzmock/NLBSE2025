@@ -44,4 +44,4 @@ EOF
 
 nvidia-smi
 
-python quantize.py --input-path /home/clusterusers/momock/NLBSE2025/result/23577 --output-path /data/users/momock/NLBSE25/results
+OMP_NUM_THREADS=1 python quantize_new.py --input-path /home/clusterusers/momock/NLBSE2025/result/23577 --output-path /data/users/momock/NLBSE25/results
