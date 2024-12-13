@@ -26,7 +26,10 @@ pip install -r req.txt
 While for FAMO use the following instructions:
 
 ```
-TBD
+cd NLBASE2025
+python -m venv env
+source env/bin/activate
+pip install -r req.txt
 ```
 
 ## Running the scripts
@@ -35,6 +38,13 @@ For the transformer there are two main options how to run the model, using the -
 
 ```
 python main.py --output-path <path> --model-path <model> --hs True
+```
+
+For the FAMO is it possible to run the model sèecifing the optuput-pah as minimum parameter:
+
+```
+export PYTHONPATH=$(pwd)
+python MTL/main.py --output-path ./results  --hs True --weight-method-name 'famo'
 ```
 
 ## Availability of the models
