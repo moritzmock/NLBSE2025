@@ -200,14 +200,14 @@ def read_args():
     parser.add_argument("--weight-decay", default=0.01)
     parser.add_argument("--lr", default=5e-5)
     parser.add_argument("--eval-strategy", default="no", choices=["no", "epoch"])
-    parser.add_argument("--weighted-loss", default="ranked", choices=["no", "yes", "ranked"])
+    parser.add_argument("--weighted-loss", default="ranked", choices=["no", "frequency", "ranked"])
 
     return parser.parse_args()
 
 
 def generate_weights(weighted_loss, data):
 
-    if weighted_loss == "yes":
+    if weighted_loss == "frequency":
         labels = data["labels"]
         labels_array = np.array(labels)
         class_counts = labels_array.sum(axis=0)
