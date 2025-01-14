@@ -366,7 +366,7 @@ def set_seed(seed):
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
 
-langs = ["java"] #['java', 'python', 'pharo']
+langs = ['java', 'python', 'pharo']
 labels = {
     'java': ['summary', 'Ownership', 'Expand', 'usage', 'Pointer', 'deprecation', 'rational'],
     'python': ['Usage', 'Parameters', 'DevelopmentNotes', 'Expand', 'Summary'],
