@@ -1,0 +1,297 @@
+Should be empty
+No Modulefiles Currently Loaded.
+Loaded moduleLoaded modules
+Currently Loaded Modulefiles:
+ 1) python/3.10.8-gcc-12.1.0-linux-ubuntu22.04-zen2   2) cuda/11.8  
+No, you are not in a virtual environment.
+Yes, you are in a virtual environment.
+Tue Jan 14 08:08:38 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 550.54.15              Driver Version: 550.54.15      CUDA Version: 12.4     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A100-SXM4-80GB          Off |   00000000:01:00.0 Off |                    0 |
+| N/A   27C    P0             60W /  500W |       0MiB /  81920MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+Available devices:
+Device 0: NVIDIA A100-SXM4-80GB
+Number of GPUs available: 1
+Namespace(output_path='/data/users/momock/NLBSE25/results', input_path=None, clear_output_path=True, hs=False, old_run='False', jobID_manual=None, model='.', batch_size=4, epochs=10, weight_decay=0.001, lr=3e-05, eval_strategy='no', weighted_loss='ranked')
+Dataset was loaded successfully!
+Tokenizer was loaded successfully!
+Namespace(output_path='/data/users/momock/NLBSE25/results', input_path=None, clear_output_path=True, hs=False, old_run='False', jobID_manual=None, model='.', batch_size=4, epochs=10, weight_decay=0.001, lr=3e-05, eval_strategy='no', weighted_loss='ranked')
+Training the model for the language java...
+Directory already exists: 
+Directory already exists: /data
+Directory already exists: /data/users
+Directory already exists: /data/users/momock
+Directory already exists: /data/users/momock/NLBSE25
+Directory already exists: /data/users/momock/NLBSE25/results
+Directory created: /data/users/momock/NLBSE25/results/25130
+Directory created: /data/users/momock/NLBSE25/results/25130/java
+Directory created: /data/users/momock/NLBSE25/results/25130/java/results
+Path structure created successfully.
+All objects in /data/users/momock/NLBSE25/results/25130/java/results have been removed.
+Directory already exists: 
+Directory already exists: /data
+Directory already exists: /data/users
+Directory already exists: /data/users/momock
+Directory already exists: /data/users/momock/NLBSE25
+Directory already exists: /data/users/momock/NLBSE25/results
+Directory already exists: /data/users/momock/NLBSE25/results/25130
+Directory already exists: /data/users/momock/NLBSE25/results/25130/java
+Directory created: /data/users/momock/NLBSE25/results/25130/java/log
+Path structure created successfully.
+All objects in /data/users/momock/NLBSE25/results/25130/java/log have been removed.
+Directory already exists: 
+Directory already exists: /data
+Directory already exists: /data/users
+Directory already exists: /data/users/momock
+Directory already exists: /data/users/momock/NLBSE25
+Directory already exists: /data/users/momock/NLBSE25/results
+Directory already exists: /data/users/momock/NLBSE25/results/25130
+Directory already exists: /data/users/momock/NLBSE25/results/25130/java
+Directory created: /data/users/momock/NLBSE25/results/25130/java/models
+Path structure created successfully.
+All objects in /data/users/momock/NLBSE25/results/25130/java/models have been removed.
+Model was loaded successfully!
+Dataset was mutated successfully!
+TrainingArguments were created successfully!
+Trainer was created successfully!
+eval_java_loss: 1.7200745169832827
+eval_java_class_summary_true_positives: 813
+eval_java_class_summary_false_positives: 88
+eval_java_class_summary_true_negatives: 745
+eval_java_class_summary_false_negatives: 79
+eval_java_class_summary_precision: 0.902330743618202
+eval_java_class_summary_recall: 0.9114349775784754
+eval_java_class_summary_f1: 0.9068600111544897
+eval_java_class_Ownership_true_positives: 45
+eval_java_class_Ownership_false_positives: 0
+eval_java_class_Ownership_true_negatives: 1680
+eval_java_class_Ownership_false_negatives: 0
+eval_java_class_Ownership_precision: 1.0
+eval_java_class_Ownership_recall: 1.0
+eval_java_class_Ownership_f1: 1.0
+eval_java_class_Expand_true_positives: 51
+eval_java_class_Expand_false_positives: 50
+eval_java_class_Expand_true_negatives: 1573
+eval_java_class_Expand_false_negatives: 51
+eval_java_class_Expand_precision: 0.504950495049505
+eval_java_class_Expand_recall: 0.5
+eval_java_class_Expand_f1: 0.5024630541871922
+eval_java_class_usage_true_positives: 375
+eval_java_class_usage_false_positives: 30
+eval_java_class_usage_true_negatives: 1264
+eval_java_class_usage_false_negatives: 56
+eval_java_class_usage_precision: 0.9259259259259259
+eval_java_class_usage_recall: 0.8700696055684455
+eval_java_class_usage_f1: 0.8971291866028708
+eval_java_class_Pointer_true_positives: 179
+eval_java_class_Pointer_false_positives: 42
+eval_java_class_Pointer_true_negatives: 1499
+eval_java_class_Pointer_false_negatives: 5
+eval_java_class_Pointer_precision: 0.8099547511312217
+eval_java_class_Pointer_recall: 0.9728260869565217
+eval_java_class_Pointer_f1: 0.8839506172839506
+eval_java_class_deprecation_true_positives: 10
+eval_java_class_deprecation_false_positives: 0
+eval_java_class_deprecation_true_negatives: 1710
+eval_java_class_deprecation_false_negatives: 5
+eval_java_class_deprecation_precision: 1.0
+eval_java_class_deprecation_recall: 0.6666666666666666
+eval_java_class_deprecation_f1: 0.8
+eval_java_class_rational_true_positives: 23
+eval_java_class_rational_false_positives: 48
+eval_java_class_rational_true_negatives: 1609
+eval_java_class_rational_false_negatives: 45
+eval_java_class_rational_precision: 0.323943661971831
+eval_java_class_rational_recall: 0.3382352941176471
+eval_java_class_rational_f1: 0.3309352517985612
+eval_java_runtime: 12.0864
+eval_java_samples_per_second: 142.723
+eval_java_steps_per_second: 35.743
+---------------------
+Training the model for the language python...
+Directory already exists: 
+Directory already exists: /data
+Directory already exists: /data/users
+Directory already exists: /data/users/momock
+Directory already exists: /data/users/momock/NLBSE25
+Directory already exists: /data/users/momock/NLBSE25/results
+Directory already exists: /data/users/momock/NLBSE25/results/25130
+Directory created: /data/users/momock/NLBSE25/results/25130/python
+Directory created: /data/users/momock/NLBSE25/results/25130/python/results
+Path structure created successfully.
+All objects in /data/users/momock/NLBSE25/results/25130/python/results have been removed.
+Directory already exists: 
+Directory already exists: /data
+Directory already exists: /data/users
+Directory already exists: /data/users/momock
+Directory already exists: /data/users/momock/NLBSE25
+Directory already exists: /data/users/momock/NLBSE25/results
+Directory already exists: /data/users/momock/NLBSE25/results/25130
+Directory already exists: /data/users/momock/NLBSE25/results/25130/python
+Directory created: /data/users/momock/NLBSE25/results/25130/python/log
+Path structure created successfully.
+All objects in /data/users/momock/NLBSE25/results/25130/python/log have been removed.
+Directory already exists: 
+Directory already exists: /data
+Directory already exists: /data/users
+Directory already exists: /data/users/momock
+Directory already exists: /data/users/momock/NLBSE25
+Directory already exists: /data/users/momock/NLBSE25/results
+Directory already exists: /data/users/momock/NLBSE25/results/25130
+Directory already exists: /data/users/momock/NLBSE25/results/25130/python
+Directory created: /data/users/momock/NLBSE25/results/25130/python/models
+Path structure created successfully.
+All objects in /data/users/momock/NLBSE25/results/25130/python/models have been removed.
+Model was loaded successfully!
+Dataset was mutated successfully!
+TrainingArguments were created successfully!
+Trainer was created successfully!
+eval_python_loss: 12.333346495302193
+eval_python_class_Usage_true_positives: 96
+eval_python_class_Usage_false_positives: 29
+eval_python_class_Usage_true_negatives: 256
+eval_python_class_Usage_false_negatives: 25
+eval_python_class_Usage_precision: 0.768
+eval_python_class_Usage_recall: 0.7933884297520661
+eval_python_class_Usage_f1: 0.7804878048780488
+eval_python_class_Parameters_true_positives: 104
+eval_python_class_Parameters_false_positives: 15
+eval_python_class_Parameters_true_negatives: 263
+eval_python_class_Parameters_false_negatives: 24
+eval_python_class_Parameters_precision: 0.8739495798319328
+eval_python_class_Parameters_recall: 0.8125
+eval_python_class_Parameters_f1: 0.8421052631578948
+eval_python_class_DevelopmentNotes_true_positives: 19
+eval_python_class_DevelopmentNotes_false_positives: 26
+eval_python_class_DevelopmentNotes_true_negatives: 339
+eval_python_class_DevelopmentNotes_false_negatives: 22
+eval_python_class_DevelopmentNotes_precision: 0.4222222222222222
+eval_python_class_DevelopmentNotes_recall: 0.4634146341463415
+eval_python_class_DevelopmentNotes_f1: 0.4418604651162791
+eval_python_class_Expand_true_positives: 35
+eval_python_class_Expand_false_positives: 24
+eval_python_class_Expand_true_negatives: 318
+eval_python_class_Expand_false_negatives: 29
+eval_python_class_Expand_precision: 0.5932203389830508
+eval_python_class_Expand_recall: 0.546875
+eval_python_class_Expand_f1: 0.5691056910569106
+eval_python_class_Summary_true_positives: 64
+eval_python_class_Summary_false_positives: 24
+eval_python_class_Summary_true_negatives: 300
+eval_python_class_Summary_false_negatives: 18
+eval_python_class_Summary_precision: 0.7272727272727273
+eval_python_class_Summary_recall: 0.7804878048780488
+eval_python_class_Summary_f1: 0.7529411764705882
+eval_python_runtime: 1.0127
+eval_python_samples_per_second: 400.909
+eval_python_steps_per_second: 100.721
+---------------------
+Training the model for the language pharo...
+Directory already exists: 
+Directory already exists: /data
+Directory already exists: /data/users
+Directory already exists: /data/users/momock
+Directory already exists: /data/users/momock/NLBSE25
+Directory already exists: /data/users/momock/NLBSE25/results
+Directory already exists: /data/users/momock/NLBSE25/results/25130
+Directory created: /data/users/momock/NLBSE25/results/25130/pharo
+Directory created: /data/users/momock/NLBSE25/results/25130/pharo/results
+Path structure created successfully.
+All objects in /data/users/momock/NLBSE25/results/25130/pharo/results have been removed.
+Directory already exists: 
+Directory already exists: /data
+Directory already exists: /data/users
+Directory already exists: /data/users/momock
+Directory already exists: /data/users/momock/NLBSE25
+Directory already exists: /data/users/momock/NLBSE25/results
+Directory already exists: /data/users/momock/NLBSE25/results/25130
+Directory already exists: /data/users/momock/NLBSE25/results/25130/pharo
+Directory created: /data/users/momock/NLBSE25/results/25130/pharo/log
+Path structure created successfully.
+All objects in /data/users/momock/NLBSE25/results/25130/pharo/log have been removed.
+Directory already exists: 
+Directory already exists: /data
+Directory already exists: /data/users
+Directory already exists: /data/users/momock
+Directory already exists: /data/users/momock/NLBSE25
+Directory already exists: /data/users/momock/NLBSE25/results
+Directory already exists: /data/users/momock/NLBSE25/results/25130
+Directory already exists: /data/users/momock/NLBSE25/results/25130/pharo
+Directory created: /data/users/momock/NLBSE25/results/25130/pharo/models
+Path structure created successfully.
+All objects in /data/users/momock/NLBSE25/results/25130/pharo/models have been removed.
+Model was loaded successfully!
+Dataset was mutated successfully!
+TrainingArguments were created successfully!
+Trainer was created successfully!
+eval_pharo_loss: 1.9707684093867897
+eval_pharo_class_Keyimplementationpoints_true_positives: 27
+eval_pharo_class_Keyimplementationpoints_false_positives: 13
+eval_pharo_class_Keyimplementationpoints_true_negatives: 233
+eval_pharo_class_Keyimplementationpoints_false_negatives: 16
+eval_pharo_class_Keyimplementationpoints_precision: 0.675
+eval_pharo_class_Keyimplementationpoints_recall: 0.627906976744186
+eval_pharo_class_Keyimplementationpoints_f1: 0.6506024096385542
+eval_pharo_class_Example_true_positives: 102
+eval_pharo_class_Example_false_positives: 4
+eval_pharo_class_Example_true_negatives: 166
+eval_pharo_class_Example_false_negatives: 17
+eval_pharo_class_Example_precision: 0.9622641509433962
+eval_pharo_class_Example_recall: 0.8571428571428571
+eval_pharo_class_Example_f1: 0.9066666666666666
+eval_pharo_class_Responsibilities_true_positives: 40
+eval_pharo_class_Responsibilities_false_positives: 25
+eval_pharo_class_Responsibilities_true_negatives: 212
+eval_pharo_class_Responsibilities_false_negatives: 12
+eval_pharo_class_Responsibilities_precision: 0.6153846153846154
+eval_pharo_class_Responsibilities_recall: 0.7692307692307693
+eval_pharo_class_Responsibilities_f1: 0.6837606837606838
+eval_pharo_class_Classreferences_true_positives: 3
+eval_pharo_class_Classreferences_false_positives: 2
+eval_pharo_class_Classreferences_true_negatives: 283
+eval_pharo_class_Classreferences_false_negatives: 1
+eval_pharo_class_Classreferences_precision: 0.6
+eval_pharo_class_Classreferences_recall: 0.75
+eval_pharo_class_Classreferences_f1: 0.6666666666666665
+eval_pharo_class_Intent_true_positives: 27
+eval_pharo_class_Intent_false_positives: 3
+eval_pharo_class_Intent_true_negatives: 256
+eval_pharo_class_Intent_false_negatives: 3
+eval_pharo_class_Intent_precision: 0.9
+eval_pharo_class_Intent_recall: 0.9
+eval_pharo_class_Intent_f1: 0.9
+eval_pharo_class_Keymessages_true_positives: 33
+eval_pharo_class_Keymessages_false_positives: 13
+eval_pharo_class_Keymessages_true_negatives: 233
+eval_pharo_class_Keymessages_false_negatives: 10
+eval_pharo_class_Keymessages_precision: 0.717391304347826
+eval_pharo_class_Keymessages_recall: 0.7674418604651163
+eval_pharo_class_Keymessages_f1: 0.7415730337078652
+eval_pharo_class_Collaborators_true_positives: 6
+eval_pharo_class_Collaborators_false_positives: 6
+eval_pharo_class_Collaborators_true_negatives: 273
+eval_pharo_class_Collaborators_false_negatives: 4
+eval_pharo_class_Collaborators_precision: 0.5
+eval_pharo_class_Collaborators_recall: 0.6
+eval_pharo_class_Collaborators_f1: 0.5454545454545454
+eval_pharo_runtime: 0.7506
+eval_pharo_samples_per_second: 385.029
+eval_pharo_steps_per_second: 97.256
+---------------------
+Execution time: 0.0-0.0-0.0-56.46327042579651
