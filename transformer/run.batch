@@ -8,9 +8,9 @@
 #SBATCH --nodes=1 # use a single cluster node
 #SBATCH --mem=64G
 #SBATCH --time=15-0:00:00
-#SBATCH --gres=gpu:a100_3g.40gb
+#SBATCH --gres=gpu:a100-sxm4-80gb
 #SBATCH --account=ml-vuln
-#SBATCH --partition=gpu-low
+#SBATCH --partition=gpu-pre
 
 cd /home/clusterusers/momock/NLBSE2025/transformer
 module purge
@@ -32,7 +32,7 @@ else:
 EOF
 )
 
-source  /data/users/momock/NLBSE25/env/bin/activate
+source  /data/users/momock/NLBSE25/env_new/bin/activate
 echo $(python <<EOF
 import sys
 if sys.prefix == sys.base_prefix:
@@ -44,4 +44,4 @@ EOF
 
 nvidia-smi
 
-python main.py --output-path /data/users/momock/NLBSE25/results --model "$1" --hs True --old-run "$2"
+python main.py --output-path /data/users/momock/NLBSE25/results --model "$1" --hs False --old-run "$2"

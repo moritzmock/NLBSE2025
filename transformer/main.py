@@ -195,10 +195,10 @@ def read_args():
                         help="If the script is not executed in a SLURM environment, the job ID can be passed "
                              "to keep manually track of the multiple executions at the same time")
     parser.add_argument("--model", default="roberta-base")
-    parser.add_argument("--batch_size", default=8)
-    parser.add_argument("--epochs", default=3)
-    parser.add_argument("--weight-decay", default=0.01)
-    parser.add_argument("--lr", default=5e-5)
+    parser.add_argument("--batch_size", default=4)
+    parser.add_argument("--epochs", default=10)
+    parser.add_argument("--weight-decay", default=0.001)
+    parser.add_argument("--lr", default=3e-5)
     parser.add_argument("--eval-strategy", default="no", choices=["no", "epoch"])
     parser.add_argument("--weighted-loss", default="ranked", choices=["no", "yes", "ranked"])
 
@@ -365,7 +365,7 @@ def set_seed(seed):
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
 
-langs = ['java', 'python', 'pharo']
+langs = ["java"] #['java', 'python', 'pharo']
 labels = {
     'java': ['summary', 'Ownership', 'Expand', 'usage', 'Pointer', 'deprecation', 'rational'],
     'python': ['Usage', 'Parameters', 'DevelopmentNotes', 'Expand', 'Summary'],
@@ -398,10 +398,10 @@ if __name__ == "__main__":
         train_models(args, ds, job_id)
 
     if args.hs == True:
-        epochs = [1, 3, 5, 10]
-        lr = [3e-5, 4e-5, 5e-5] # 1e-5, 2e-5, 
+        epochs = [10]
+        lr = [3e-5, 4e-5] # 1e-5, 2e-5, 
         eval_strategy = ["no"]
-        batch_size = [1, 2, 4, 8, 16]
+        batch_size = [1, 2, 4,]
         weight_decay = [0, 0.01, 0.001]
         arrays = [epochs, lr, eval_strategy, batch_size, weight_decay]
         combinations = generate_combinations(*arrays)
