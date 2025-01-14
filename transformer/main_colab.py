@@ -88,7 +88,7 @@ if __name__ == "__main__":
             pbar.update(1)
         pbar.close()
 
-        labels = torch.tensor(test_data["labels"].tolist()).to(device)
+        labels = torch.tensor(np.array(test_data["labels"].tolist())).to(device)
         labels = labels.cpu().numpy()
 
         num_classes = len(labels_langs[lan])
