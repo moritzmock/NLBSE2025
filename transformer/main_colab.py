@@ -6,6 +6,7 @@ import os
 from datasets import load_dataset, Dataset
 import time
 import pandas as pd
+from tqdm import tqdm
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
@@ -37,11 +38,13 @@ if __name__ == "__main__":
     }
 
     ds = load_dataset('NLBSE/nlbse25-code-comment-classification')
+    print("Dataset loaded...")
 
     set_seed(42)
 
     # for all the models codebert is performing the best, therefore, we only need to load its tokenizer
     tokenizer = RobertaTokenizer.from_pretrained("microsoft/codebert-base")
+    print("Tokenizer loaded...")
 
     total_flops = 0
     total_time = 0
@@ -57,6 +60,8 @@ if __name__ == "__main__":
         predictions = []
 
         test_data = test.to_pandas()
+
+        pbar = tqdm(total=len(test_data), desc=f"{lan}...")
 
         for index, row in test_data.iterrows():
             combo = row["combo"]
@@ -78,6 +83,9 @@ if __name__ == "__main__":
             # Convert probabilities to binary predictions (threshold = 0.5)
             threshold = 0.5
             predictions.append((probs > threshold).int().cpu().numpy().tolist()[0])
+
+            pbar.update(1)
+        pbar.close()
 
         labels = torch.tensor(test_data["labels"].tolist()).to(device)
         labels = labels.cpu().numpy()
