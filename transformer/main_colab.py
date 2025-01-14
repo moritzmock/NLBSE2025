@@ -65,7 +65,7 @@ if __name__ == "__main__":
 
         for index, row in test_data.iterrows():
             combo = row["combo"]
-            input_ids = tokenizer(combo, return_tensors="pt").to(device)
+            input_ids = tokenizer(combo, return_tensors="pt", padding=True, truncation=True, max_length=512).to(device)
             start_time = time.time()
             with torch.profiler.profile(with_flops=True) as p:
                 # Forward pass
@@ -73,6 +73,7 @@ if __name__ == "__main__":
                     outputs = model(**input_ids)
             end_time = time.time()
             total_time = total_time + end_time - start_time
+            print(total_time)
             total_flops = total_flops + (sum(k.flops for k in p.key_averages()) / 1e9)
             # Extract logits (raw outputs)
             logits = outputs.logits
