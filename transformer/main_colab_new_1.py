@@ -65,7 +65,7 @@ if __name__ == "__main__":
         pbar = tqdm(total=len(test_data), desc=f"{lan}...")
 
         # Define batch size
-        batch_size = 16  # Adjust based on your GPU memory
+        batch_size = 32  # Adjust based on your GPU memory
 
         # Tokenize all data at once
         tokenized_data = tokenizer(
