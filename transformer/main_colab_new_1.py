@@ -63,29 +63,39 @@ if __name__ == "__main__":
 
         pbar = tqdm(total=len(test_data), desc=f"{lan}...")
 
-        for index, row in test_data.iterrows():
-            combo = row["combo"]
-            input_ids = tokenizer(combo, return_tensors="pt", padding=True, truncation=True, max_length=512).to(device)
-            start_time = time.time()
-            with torch.profiler.profile(with_flops=True) as p:
-                # Forward pass
-                for i in range(10):
-                    outputs = model(**input_ids)
-            end_time = time.time()
-            total_time = total_time + end_time - start_time
-            print(total_time)
-            total_flops = total_flops + (sum(k.flops for k in p.key_averages()) / 1e9)
-            # Extract logits (raw outputs)
-            logits = outputs.logits
+        # Tokenize the entire DataFrame at once
+        combos = test_data["combo"].tolist()
+        input_ids = tokenizer(combos, return_tensors="pt", padding=True, truncation=True, max_length=512).to(device)
 
-            # Apply sigmoid activation to get probabilities
-            probs = torch.sigmoid(logits)
+        # Track total time and FLOPs
+        total_time = 0
+        total_flops = 0
+        predictions = []
 
-            # Convert probabilities to binary predictions (threshold = 0.5)
-            threshold = 0.5
-            predictions.append((probs > threshold).int().cpu().numpy().tolist()[0])
+        # Forward pass for the entire batch
+        start_time = time.time()
+        with torch.profiler.profile(with_flops=True) as p:
+            for _ in range(10):
+                outputs = model(**input_ids)
+        end_time = time.time()
+        total_time += end_time - start_time
+        print(total_time)
 
-            pbar.update(1)
+        # Calculate total FLOPs
+        total_flops += (sum(k.flops for k in p.key_averages()) / 1e9)
+
+        # Extract logits (raw outputs)
+        logits = outputs.logits
+
+        # Apply sigmoid activation to get probabilities
+        probs = torch.sigmoid(logits)
+
+        # Convert probabilities to binary predictions (threshold = 0.5)
+        threshold = 0.5
+        predictions = (probs > threshold).int().cpu().numpy().tolist()
+
+        # Update the progress bar
+        pbar.update(len(test_data))
         pbar.close()
 
         labels = torch.tensor(test_data["labels"].tolist()).to(device)
@@ -129,24 +139,7 @@ if __name__ == "__main__":
     print("Compute in GFLOPs:", total_flops / 10)
     print("Avg runtime in seconds:", total_time / 10)
     scores = pd.DataFrame(scores)
-    print(scores)
-
-    max_avg_runtime = total_time / 10
-    max_avg_flops = total_flops / 10
-
-
-    # s𝑢𝑏𝑚𝑖𝑠𝑠𝑖𝑜𝑛_𝑠𝑐𝑜𝑟𝑒(𝑚𝑜𝑑𝑒𝑙)=(𝑎𝑣𝑔. 𝐹1)×0.60+((𝑚𝑎𝑥_𝑎𝑣𝑔_𝑟𝑢𝑛𝑡𝑖𝑚𝑒−𝑚𝑒𝑎𝑠𝑢𝑟𝑒𝑑_𝑎𝑣𝑔_𝑟𝑢𝑛𝑡𝑖𝑚𝑒)/𝑚𝑎𝑥_𝑎𝑣𝑔_𝑟𝑢𝑛𝑡𝑖𝑚𝑒)×0.2+((𝑚𝑎𝑥_GFLOPs−𝑚𝑒𝑎𝑠𝑢𝑟𝑒𝑑_GFLOPs)/𝑚𝑎𝑥_GFLOPs)×0.2
-    def score(avg_f1, avg_runtime, avg_flops):
-        return (0.6 * avg_f1 +
-                0.2 * ((max_avg_runtime - avg_runtime) / max_avg_runtime) +
-                0.2 * ((max_avg_flops - avg_flops) / max_avg_flops))
-
-
-    avg_f1 = scores.f1.mean()
-    avg_runtime = total_time / 10
-    avg_flops = total_flops / 10
-
-    round(score(avg_f1, avg_runtime, avg_flops), 2)
+    scores
 
 
 
