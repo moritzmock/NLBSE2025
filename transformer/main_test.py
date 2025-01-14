@@ -384,7 +384,7 @@ if __name__ == "__main__":
     ds = load_dataset('NLBSE/nlbse25-code-comment-classification')
     print("Dataset was loaded successfully!")
 
-    tokenizer = RobertaTokenizer.from_pretrained(args.model)
+    tokenizer = RobertaTokenizer.from_pretrained("microsoft/codebert-base")
 
     print("Tokenizer was loaded successfully!")
 
