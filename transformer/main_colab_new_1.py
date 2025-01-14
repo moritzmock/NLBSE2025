@@ -7,6 +7,7 @@ from datasets import load_dataset, Dataset
 import time
 import pandas as pd
 from tqdm import tqdm
+from torch.utils.data import DataLoader, TensorDataset
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
@@ -63,40 +64,59 @@ if __name__ == "__main__":
 
         pbar = tqdm(total=len(test_data), desc=f"{lan}...")
 
-        # Tokenize the entire DataFrame at once
-        combos = test_data["combo"].tolist()
-        input_ids = tokenizer(combos, return_tensors="pt", padding=True, truncation=True, max_length=512).to(device)
+        # Define batch size
+        batch_size = 16  # Adjust based on your GPU memory
 
-        # Track total time and FLOPs
+        # Tokenize all data at once
+        tokenized_data = tokenizer(
+            test_data["combo"].tolist(),
+            return_tensors="pt",
+            padding=True,
+            truncation=True,
+            max_length=512
+        )
+
+        # Create a DataLoader for batch processing
+        dataset = TensorDataset(tokenized_data["input_ids"], tokenized_data["attention_mask"])
+        data_loader = DataLoader(dataset, batch_size=batch_size)
+
+        # Initialize variables
         total_time = 0
         total_flops = 0
         predictions = []
+        pbar = tqdm(total=len(test_data), desc=f"{lan}...")
 
-        # Forward pass for the entire batch
-        start_time = time.time()
-        with torch.profiler.profile(with_flops=True) as p:
-            for _ in range(10):
-                outputs = model(**input_ids)
-        end_time = time.time()
-        total_time += end_time - start_time
-        print(total_time)
+        # Process batches
+        for batch in data_loader:
+            input_ids, attention_mask = batch
+            input_ids = input_ids.to(device)
+            attention_mask = attention_mask.to(device)
 
-        # Calculate total FLOPs
-        total_flops += (sum(k.flops for k in p.key_averages()) / 1e9)
+            # Perform forward pass and measure performance
+            start_time = time.time()
+            with torch.profiler.profile(with_flops=True) as p:
+                for _ in range(10):
+                    outputs = model(input_ids=input_ids, attention_mask=attention_mask)
+            end_time = time.time()
 
-        # Extract logits (raw outputs)
-        logits = outputs.logits
+            total_time += end_time - start_time
 
-        # Apply sigmoid activation to get probabilities
-        probs = torch.sigmoid(logits)
+            # Calculate FLOPs for the batch
+            total_flops += (sum(k.flops for k in p.key_averages()) / 1e9)
 
-        # Convert probabilities to binary predictions (threshold = 0.5)
-        threshold = 0.5
-        predictions = (probs > threshold).int().cpu().numpy().tolist()
+            # Extract logits and compute predictions
+            logits = outputs.logits
+            probs = torch.sigmoid(logits)
+            threshold = 0.5
+            batch_predictions = (probs > threshold).int().cpu().numpy().tolist()
+            predictions.extend(batch_predictions)
 
-        # Update the progress bar
-        pbar.update(len(test_data))
+            # Update progress bar
+            pbar.update(len(batch_predictions))
+
         pbar.close()
+        print(f"Total Time: {total_time:.2f} seconds")
+        print(f"Total FLOPs: {total_flops:.2f} GFLOPs")
 
         labels = torch.tensor(np.array(test_data["labels"].tolist())).to(device)
         labels = labels.cpu().numpy()
