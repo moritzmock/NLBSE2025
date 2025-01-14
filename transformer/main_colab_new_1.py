@@ -161,8 +161,8 @@ if __name__ == "__main__":
     scores = pd.DataFrame(scores)
     print(scores)
 
-    max_avg_runtime = total_time / 10
-    max_avg_flops = total_flops / 10
+    max_avg_runtime = 5
+    max_avg_flops = 5000
 
 
     # s𝑢𝑏𝑚𝑖𝑠𝑠𝑖𝑜𝑛_𝑠𝑐𝑜𝑟𝑒(𝑚𝑜𝑑𝑒𝑙)=(𝑎𝑣𝑔. 𝐹1)×0.60+((𝑚𝑎𝑥_𝑎𝑣𝑔_𝑟𝑢𝑛𝑡𝑖𝑚𝑒−𝑚𝑒𝑎𝑠𝑢𝑟𝑒𝑑_𝑎𝑣𝑔_𝑟𝑢𝑛𝑡𝑖𝑚𝑒)/𝑚𝑎𝑥_𝑎𝑣𝑔_𝑟𝑢𝑛𝑡𝑖𝑚𝑒)×0.2+((𝑚𝑎𝑥_GFLOPs−𝑚𝑒𝑎𝑠𝑢𝑟𝑒𝑑_GFLOPs)/𝑚𝑎𝑥_GFLOPs)×0.2
@@ -176,7 +176,7 @@ if __name__ == "__main__":
     avg_runtime = total_time / 10
     avg_flops = total_flops / 10
 
-    round(score(avg_f1, avg_runtime, avg_flops), 2)
+    print(round(score(avg_f1, avg_runtime, avg_flops), 2))
 
 
 
