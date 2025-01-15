@@ -40,12 +40,24 @@ For the transformer there are two main options how to run the model, using the -
 python main.py --output-path <path> --model-path <model> --hs True
 ```
 
-For the FAMO is it possible to run the model sèecifing the optuput-pah as minimum parameter:
+For the FAMO is it possible to run the model specifying the output-path as minimum parameter:
 
 ```
 export PYTHONPATH=$(pwd)
 python MTL/main.py --output-path ./results  --hs True --weight-method-name 'famo'
 ```
+
+### Result of Hyper-Parameter Search
+
+In the following table the best hyper-parameters which resulted into the best performing fine-tuned pre-trained models can be found. The values of the can be found at the paper (see above for the link).
+
+| Dataset | Batch Size | Epochs | Learning Rate | Weight Decay | Weighted loss* |
+|---------|------------|--------|---------------|--------------|----------------|
+| Java    | 4          | 10     | 3e-5          | 0.001        | ranked         |
+| Python  | 2          | 10     | 4e-5          | 0            | ranked         |
+| Pharo   | 4          | 10     | 3e-5          | 0.01         | frequency      |
+
+While the *Weighted loss** is not part of a Hyper-Parameter Search in the traditional sense, we have considered to place it here as it influences the performance of a pre-trained model in the fine-tuning step.
 
 ## Availability of the models
 The best performing models are available at huggingface:
@@ -54,8 +66,8 @@ Java: https://huggingface.co/mmock/NLBSE2025_java
 
 Pharo: https://huggingface.co/mmock/NLBSE2025_pharo
 
-Python:https://huggingface.co/mmock/NLBSE2025_python
+Python: https://huggingface.co/mmock/NLBSE2025_python
 
 ## Google Colab
 
-In the following there is an example implementation on how the models can be tested: https://colab.research.google.com/drive/1q6x-x5MwhgnRkjErBpbvxMSZAE_UypuO?authuser=1
+In the following the notebook which was used for the inference and the calculation of the submission score can be found: https://colab.research.google.com/drive/1q6x-x5MwhgnRkjErBpbvxMSZAE_UypuO?usp=sharing
