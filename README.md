@@ -6,7 +6,7 @@ Link to preprint: **under review**
 
 ## Abstract
 
-Developers rely on code comments to document their work, track issues, and understand the source code. As such, comments provide valuable insights into developers' understanding of their code and describe their various intentions in writing the surrounding code. Recent research leverages natural language processing and deep learning to classify comments based on developers' intentions. Unfortunately, such labeled data are often imbalanced, causing learning models to perform poorly.
+Developers rely on code comments to document their work, track issues, and understand the source code. As such, comments provide valuable insights into developers' understanding of their code and describe their various intentions in writing the surrounding code. Recent research leverages natural language processing and deep learning to classify comments based on developers' intentions. Unfortunately, such labelled data are often imbalanced, causing learning models to perform poorly.
 To address this, mitigating the scarcity of certain classes in the dataset is crucial.
 In this study, we fine-tuned various RoBERTa-based transformer models and conducted a hyperparameter search to identify their optimal parameter configurations. Additionally, we executed the transformers with different loss functions to address class imbalances.
 Our approach outperforms the STACC baseline by 8.7 per cent on the NLBSE’25 Tool Competition dataset in terms of average F1$_c$-score, also exceeding the baseline for 17 out of 19 cases with a gain ranging from -5.0 to 38.2.
@@ -34,7 +34,7 @@ pip install -r req.txt
 
 ## Running the scripts
 
-For the transformer there are two main options how to run the model, using the --hs flag such that the other parameters are ignored, e.g., not not using it such that the parameters can be passed:
+For the transformer there are two main options how to run the model, using the --hs flag such that the other parameters are ignored, e.g., not using it such that the parameters can be passed:
 
 ```
 python main.py --output-path <path> --model-path <model> --hs True
@@ -72,4 +72,4 @@ Python: https://huggingface.co/mmock/NLBSE2025_python
 
 In the following the notebook which was used for the inference and the calculation of the submission score can be found: https://colab.research.google.com/drive/1q6x-x5MwhgnRkjErBpbvxMSZAE_UypuO?usp=sharing
 
-The results which we have obtained are the following: F1 72.6, avg. runtime 11,6 seconds, GFLOPs 155.300, submission score -5.6 
+The results which we have obtained are the following: F1 72.6, avg. runtime of 11.6 seconds, GFLOPs of 155,300, submission score -5.6. 
