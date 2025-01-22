@@ -53,9 +53,9 @@ In the following table the best hyper-parameters which resulted into the best pe
 
 | Dataset | Batch Size | Epochs | Learning Rate | Weight Decay | Weighted loss* |
 |---------|------------|--------|---------------|--------------|----------------|
-| Java    | 4          | 10     | 3e-5          | 0.001        | ranked         |
-| Python  | 2          | 10     | 4e-5          | 0            | ranked         |
-| Pharo   | 4          | 10     | 3e-5          | 0.01         | frequency      |
+| Java    | 4          | 10     | 3e-5          | 0.001        | RBF            |
+| Python  | 2          | 10     | 4e-5          | 0            | RBF            |
+| Pharo   | 4          | 10     | 3e-5          | 0.01         | ICF            |
 
 While the *Weighted loss** is not part of a Hyper-Parameter Search in the traditional sense, we have considered to place it here as it influences the performance of a pre-trained model in the fine-tuning step.
 
