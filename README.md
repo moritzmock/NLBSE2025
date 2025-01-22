@@ -51,13 +51,13 @@ python MTL/main.py --output-path ./results  --hs True --weight-method-name 'famo
 
 In the following table the best hyper-parameters which resulted into the best performing fine-tuned pre-trained models can be found. The values of the can be found at the paper (see above for the link).
 
-| Dataset | Batch Size | Epochs | Learning Rate | Weight Decay | Weighted loss* |
+| Dataset | Batch Size | Epochs | Learning Rate | Weight Decay | loss weights*  |
 |---------|------------|--------|---------------|--------------|----------------|
 | Java    | 4          | 10     | 3e-5          | 0.001        | RBF            |
 | Python  | 2          | 10     | 4e-5          | 0            | RBF            |
 | Pharo   | 4          | 10     | 3e-5          | 0.01         | ICF            |
 
-While the *Weighted loss** is not part of a Hyper-Parameter Search in the traditional sense, we have considered to place it here as it influences the performance of a pre-trained model in the fine-tuning step.
+While the *loss weights** is not part of a Hyper-Parameter Search in the traditional sense, we have considered to place it here as it influences the performance of a pre-trained model in the fine-tuning step.
 
 ## Availability of the models
 The best performing models are available at huggingface:
