@@ -72,4 +72,4 @@ Python: https://huggingface.co/mmock/NLBSE2025_python
 
 In the following the notebook which was used for the inference and the calculation of the submission score can be found: https://colab.research.google.com/drive/1q6x-x5MwhgnRkjErBpbvxMSZAE_UypuO?usp=sharing
 
-The results which we have obtained are the following: F1 72.6, avg. runtime of 11.6 seconds, GFLOPs of 155,300, submission score -5.6. 
+The results which we have obtained are the following: F1 72.6, avg. runtime of 11.6 seconds, GFLOPs of 155,300, submission score 0.44. 
