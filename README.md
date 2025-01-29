@@ -2,7 +2,7 @@
 
 This repository contains the replication package for the work *Optimizing Deep Learning Models to Address Class Imbalance in Code Comment Classification*. The work was conducted by Moritz Mock, Thomas Borsani, Giuseppe Di Fatta, and Barbara Russo.
 
-Link to preprint: **under review**
+Link to preprint: [https://doi.org/10.48550/arXiv.2501.15854](https://doi.org/10.48550/arXiv.2501.15854)
 
 ## Abstract
 
@@ -73,3 +73,19 @@ Python: https://huggingface.co/mmock/NLBSE2025_python
 In the following the notebook which was used for the inference and the calculation of the submission score can be found: https://colab.research.google.com/drive/1q6x-x5MwhgnRkjErBpbvxMSZAE_UypuO?usp=sharing
 
 The results which we have obtained are the following: F1 72.6, avg. runtime of 11.6 seconds, GFLOPs of 155,300, submission score 0.44. 
+
+## How to cite the work
+
+#### Preprint:
+
+```bibtext
+@misc{mock2025optimizingdeeplearningmodels,
+      title={Optimizing Deep Learning Models to Address Class Imbalance in Code Comment Classification}, 
+      author={Moritz Mock and Thomas Borsani and Giuseppe Di Fatta and Barbara Russo},
+      year={2025},
+      eprint={2501.15854},
+      archivePrefix={arXiv},
+      primaryClass={cs.SE},
+      url={https://arxiv.org/abs/2501.15854}, 
+}
+```
