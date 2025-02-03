@@ -6,11 +6,10 @@ Link to preprint: [https://doi.org/10.48550/arXiv.2501.15854](https://doi.org/10
 
 ## Abstract
 
-Developers rely on code comments to document their work, track issues, and understand the source code. As such, comments provide valuable insights into developers' understanding of their code and describe their various intentions in writing the surrounding code. Recent research leverages natural language processing and deep learning to classify comments based on developers' intentions. Unfortunately, such labelled data are often imbalanced, causing learning models to perform poorly.
-To address this, mitigating the scarcity of certain classes in the dataset is crucial.
-In this study, we fine-tuned various RoBERTa-based transformer models and conducted a hyperparameter search to identify their optimal parameter configurations. Additionally, we executed the transformers with different loss functions to address class imbalances.
-Our approach outperforms the STACC baseline by 8.7 per cent on the NLBSE’25 Tool Competition dataset in terms of average F1$_c$-score, also exceeding the baseline for 17 out of 19 cases with a gain ranging from -5.0 to 38.2.
-The source code is publicly available at https://github.com/moritzmock/NLBSE2025.
+Developers rely on code comments to document their work, track issues, and understand the source code. As such, comments provide valuable insights into developers' understanding of their code and describe their various intentions in writing the surrounding code. Recent research leverages natural language processing and deep learning to classify comments based on developers' intentions. However, such labelled data are often imbalanced, causing learning models to perform poorly.
+This work investigates the use of different weighting strategies of the loss function to mitigate the scarcity of certain classes in the dataset. In particular, various RoBERTa-based transformer models are fine-tuned by means of a hyperparameter search to identify their optimal parameter configurations. Additionally, we fine-tuned the transformers with different weighting strategies for the loss function to address class imbalances.
+Our approach outperforms the STACC baseline by 8.9 per cent on the NLBSE'25 Tool Competition dataset in terms of the average F1$_c$ score, and exceeding the baseline approach in 17 out of 19 cases with a gain ranging from -5.0 to 38.2.
+ The source code is publicly available at https://github.com/moritzmock/NLBSE2025.
 
 ## Installation
 
